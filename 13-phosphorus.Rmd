@@ -1,0 +1,7 @@
+# Phosphorus {#Phosphorus-stress}
+
+
+In the current version of APSIM-Wheat module, no phosphorus stress
+$f_{P,\,pheno}=1$ is applied in the soil system through parameter
+labile_p in the source codes.
+

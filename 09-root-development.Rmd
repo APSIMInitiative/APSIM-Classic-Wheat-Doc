@@ -1,0 +1,229 @@
+
+# Root growth and distribution
+
+
+
+## Root depth growth
+
+
+Between germination and start of grain filling (Fig. \@ref(fig:PhenologWheatModule)),
+the increase in root depth ($\Delta D_{r}$) is a daily rate multiplied
+by a number of factors. Daily root depth growth ($\Delta D_{r}$)
+is calculated by root depth growth rate ($R_{r}$), temperature factor
+($f_{rt}$), soil water factor ($f_{rw}$), and soil water available
+factor ($f_{rwa}$) and root exploration factor ($\text{XF}(i)$).
+
+
+\begin{equation}
+
+\Delta D_{r}=R_{r}\times f_{rt}\times\min(f_{rw},\;f_{rwa})\text{\ensuremath{\times}XF}(i) (\#eq:rootDepthGrowth)
+
+\end{equation}
+
+where $i$ is the soil layer number in which root tips are growing.
+Root depth growth rate is a function of growth stage, which is defined
+by parameters `stage_code_list` and `root_depth_rate`
+in the wheat.xml and is linearly interpolated by APSIM (Fig. \@ref(fig:wdRootGrowthRate)). 
+
+
+```{r wdRootGrowthRate,fig.cap='Relationship between root depth growth rate ($R_{r}$) and growth stages.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"stage_code_list", "root_depth_rate",
+		xlab = "Stage codes",
+		ylab = "Root depth growth rate (mm/d)")
+print(p)
+
+```
+
+
+The temperature factor ($f_{rt}$) is calculated by daily mean temperature.
+
+
+\begin{equation}
+
+f_{rt}=h_{rt}(\frac{T_{max}+T_{min}}{2}) (\#eq:RootGrowthTemperature)
+
+\end{equation}
+
+where $h_{rt}$ is a function of factor of temperature on root length
+and daily mean temperature and is defined by parameters `x_temp_root_advance`
+and `y_rel_root_advance` in the wheat.xml which is linearly
+interpolated by APSIM (Fig. \@ref(fig:wdTempRootFactor)). 
+
+
+```{r wdTempRootFactor,fig.cap='Relationship ($h_{rt}$) between temperature factor on root length and daily mean temperature.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_temp_root_advance", "y_rel_root_advance",
+		xlab = expression(paste("Mean daily temperature", ~"("*degree*"C)")),
+		ylab = "Temperature factor on root length")
+print(p)
+
+```
+
+
+The soil water factor ($f_{rw}$) is calculated by soil water stresses
+of photosynthesis ($f_{w,\,photo}$, Equation \@ref(eq:swstressphoto)).
+
+
+\begin{equation}
+
+f_{rw}=h_{rw}(f_{w,\,photo})
+
+\end{equation}
+
+where $h_{rw}$ is a function of soil-water factor affecting root
+depth growth in response to soil water stress for photosynthesis.
+This function is defined by parameters `x_ws_root` and `y_ws_root_fac`,
+which are linearly interpolated by APSIM. The default value of $f_{rw}$
+is 1, i.e. there is no soil water stress on root depth growth in current
+APSIM-Wheat.
+
+The soil water available factor ($f_{rwa}$) is calculated by fraction
+of available soil water.
+
+
+\begin{equation}
+
+f_{rwa}=h_{rwa}(\text{FASW}) (\#eq:Soilwateravailablefactor)
+
+\end{equation}
+
+where $h_{rwa}$ is a function of the fraction of available soil water
+(FASW) is defined in wheat.xml by parameters `x_sw_ratio`
+and `y_sw_fac_root` which is linearly interpolated by APSIM
+(Fig. \@ref(fig:wdWaterAvaiOnRoot)). 
+
+
+```{r wdWaterAvaiOnRoot,fig.cap='Available soil water fraction ($f_{rwa}$) in response to the fraction of available soil water (FASW).' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_sw_ratio", "y_sw_fac_root",
+		xlab = "Fraction of available soil water",
+		ylab = "Stress factor for root depth growth")
+print(p)
+
+```
+
+
+The fraction of available soil water (FASW) is calculated by a fraction
+of root dpeth in soil layer $i$ ($D_{r}(i)$) and depth of soil layer
+$i$ ($D_{s}(i)$), and FASW at layer $i+1$ and $i$.
+
+
+\begin{equation}
+
+\text{FASW}=\frac{D_{r}(i)}{D_{s}(i)}\text{FASW}(i+1)+(1-\frac{D_{r}(i)}{D_{s}(i)})\text{FASW}(i)
+
+\end{equation}
+
+where $\text{FASW}(i)$ is the fraction of available soil water in
+ soil layer $i$. $D_{r}(i)$ is the root depth within the deepest
+soil layer ($i$) where roots are present , $D_{s}(i)$ is the thickness
+of this layer $i$, and 
+
+
+\begin{equation}
+
+\text{FASW}(i)=\frac{\text{SW}(i)-\text{LL}(i)}{\text{DUL}(i)-\text{LL}(i)}
+
+\end{equation}
+
+where $\text{SW}(i)$ is the soil water content at layer $i$ (mm),
+$\text{LL}(i)$ is the lower limit of plant-extractable soil water
+in layer $i$ (mm), $\text{DUL}(i)$ is drained upper limit soil water
+content in soil layer $i$ (mm). $\text{XF}(i)$, $\text{SW}(i)$,
+$\text{LL}(i)$ and $\text{DUL}(i)$ are specified at the soil module
+of APSIM simulation files.
+
+Finally, Equation \@ref(eq:rootDepthGrowth) is reduced to this function.
+
+\begin{equation}
+
+\Delta D_{r}=R_{r}\times f_{rt}\times f_{rwa}\text{\ensuremath{\times}XF}(i) (\#eq:rootDepthGrowth-1)
+
+\end{equation}
+
+
+Overall, root depth is constrained by the soil profile depth. The
+optimum root expansion rate is 30 mm d\textsuperscript{-1} (Fig. \@ref(fig:wdRootGrowthRate)).
+This can be limited by supra- or sub-optimal mean air temperatures
+(Fig. \@ref(fig:wdTempRootFactor)). Dry soil can slow root depth progression
+if the soil water content is less than 25\% of the extractable soil
+water (drained upper limit - lower limit) in the layers they are about
+to reach (Fig. \@ref(fig:wdWaterAvaiOnRoot)). The increase of root
+depth through a layer can also be reduced by knowing soil constraints
+(soil compression) through the use of the 0-1 parameter XF, which
+is input for each soil layer. Root depth is used by APSIM to calculate
+soil available water (e.g \autoref{sec:Crop-Water-Relations}).
+
+
+## Root length
+
+
+Daily root length growth is calculated by daily growth of `Root`
+biomass ($\Delta Q_{root}$, Equation \@ref(eq:RootBiomass)) and specific
+root length ($\text{SRL}$, defined by `specific_root_length`
+in wheat.xml with a default value of 105000 mm g\textsuperscript{-1}).
+
+\begin{equation}
+
+\Delta L_{r}=\Delta Q_{root}\times\text{SRL}
+
+\end{equation}
+
+
+The daily root length growth ($\Delta L_{r}$) is distributed to each
+soil layer $i$ according to root depth and soil water availability
+in soil layer $i$.
+
+\begin{equation}
+
+\Delta D_{r}(i)=\frac{f_{rl}(i)}{\sum_{j=1}^{N}f_{rl}(j)}
+
+\end{equation}
+
+where $f_{rl}(i)$ is a factor of root length growth in  soil layer
+$i$.
+
+\begin{equation}
+
+f_{rl}(i)=f_{rwa}\times f_{b}(i)\text{\ensuremath{\times}XF}(i)\times\frac{D_{s}(i)}{D_{r}}\,
+
+\end{equation}
+
+where $\Delta L_{r}(i)$ is the daily root length growth for soil
+layer $i$, $D_{s}(i)$ is the depth of the soil layer $i$, $D_{r}$
+is total root depth from the previous day, $\text{XF}(i)$ is root
+exploration factor in  soil layer $i$, $f_{rwa}$ is soil water available
+factor (Equation \@ref(eq:Soilwateravailablefactor)), \textbf{$f_{b}(i)$
+}is branch factor at layer $i$.
+
+\begin{equation}
+
+f_{b}(i)=h_{b}(\frac{L_{r}(i)}{D_{p}D_{s}(i)})
+
+\end{equation}
+
+where $L_{r}(i)$ is the root length in  soil layer $i$, $D_{p}$
+is plant population, $h_{b}$ is a function for branch factor that
+is defined by parameters `x_plant_rld` and `y_rel_root_rate`
+in the wheat.xml and linearly interpolated by APSIM (Fig. \@ref(fig:wdRootBranching)). 
+
+
+```{r wdRootBranching,fig.cap='Root branching factor in response to root branching.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_plant_rld", "y_rel_root_rate",
+		xlab = "Root branching (mm/mm3/plant)",
+		ylab = "Root branching factor")
+print(p)
+
+```
+
+
+Root length has no effect on other traits in the current version of
+APSIM-Wheat. It is just used by the root senescence routine.
+
+

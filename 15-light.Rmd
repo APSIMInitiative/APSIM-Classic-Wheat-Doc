@@ -1,0 +1,27 @@
+
+
+# Light 
+
+
+Light photoperiod is calculated as detailed in 
+ Section @ref(Photoperiod). Photoperiod affects wheat phenology. 
+
+Light intensity and photoperiod also have an effect on diffuse light
+fraction (\autoref{par:Diffuse-factor}), so that it could impact
+the diffuse factor ($f_{d}$; Equation \@ref(eq:BiomassProduction);  Section @ref(Radiation-limited-biomass))
+and reduce the radiation-limited biomass accumulation ($\Delta Q_{r}$;
+ Section @ref(Radiation-limited-biomass)). However, in the current
+APSIM-Wheat, the diffuse factor equals to 1 (i.e. no impact of diffuse
+light on biomass production). 
+
+Light intensity affects
+\begin{itemize}
+\item radiation-limited biomass accumulation ($\Delta Q_{r}$;  Section @ref(Radiation-limited-biomass))
+via the radiation interception ($I$; Equation \@ref(eq:RadiationInterception)),
+which depends on the incoming radiation ($I_{0}$) and on a light-interception
+factor ($f_{h}$ ) based on the canopy width. However, this canopy
+factor has no impact in the current version of APSIM-Wheat ($f_{h}$
+= 1), 
+\item LAI senescence under low light condition ($\Delta LAI_{sen,\,light}$;
+Equation \@ref(eq:SensLight)). 
+\end{itemize}

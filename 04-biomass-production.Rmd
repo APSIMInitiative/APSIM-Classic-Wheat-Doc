@@ -1,0 +1,371 @@
+
+
+# Biomass accumulation (Photosynthesis)
+
+
+The daily biomass accumulation ($\Delta Q$) corresponds to dry-matter
+above-ground biomass, and is calculated as a potential biomass accumulation
+resulting from radiation interception ($\Delta Q_{r}$, Equation \@ref(eq:BiomassProduction))
+that is limited by soil water deficiency ($\Delta Q_{w}$, Equation \@ref(eq:WaterStressBiomassProduction-1)).
+
+
+## Potential biomass accumulation from radiation use efficiency\label{subsec:Radiation-limited-biomass}
+
+
+The radiation-limited dry-biomass accumulation ($\Delta Q_{r}$) is
+calculated by the intercepted radiation ($I$), radiation use efficiency
+($RUE$), diffuse factor ($f_{d}$, \autoref{par:Diffuse-factor}),
+stress factor ($f_{s}$, Equation \@ref(eq:StressFactor4Photosynthesis))
+and carbon dioxide factor ($f_{c}$, Equation \@ref(eq:CO2Factor4Photosynthesis)).
+
+
+\begin{equation}
+
+\Delta Q_{r}=I\times RUE\times f_{d}\times f_{s}\times f_{c} (\#eq:BiomassProduction)
+
+\end{equation}
+
+where $f_{d}$, $f_{s}$ and $f_{c}$ are defined in the wheat.xml
+file. In the current version of APSIM-Wheat, only `Leaf` produces
+photosynthate. Diffuse factor ($f_{d}$) equals to 1 (\autoref{par:Diffuse-factor}),
+so that Equation \@ref(eq:BiomassProduction) can be: 
+
+\begin{equation}
+
+\Delta Q_{r}=I\times RUE\times f_{s}\times f_{c} (\#eq:BiomassProduction2)
+
+\end{equation}
+
+
+
+
+### Radiation interception
+
+
+Radiation interception is calculated from the leaf area index (LAI,
+m$^{2}$ m$^{-2}$) and the extinction coefficient (\textit{k}) \citep{monsi2005onthe}.
+
+\begin{equation}
+
+I=I_{0}(1-\exp(-k\times LAI\times f_{h})/f_{h}) (\#eq:RadiationInterception)
+
+\end{equation}
+
+where $I_{0}$ is the total radiation at the top of the canopy (MJ)
+which is directly imported from weather records; $f_{h}$ is light
+interception modified to give hedge-row effect with skip row. $f_{h}$
+could be calculated based on the canopy width, but is not used in
+the current version of APSIM (i.e. $f_{h}$ = 1). So, Equation \@ref(eq:RadiationInterception)
+is reduced to.
+
+\begin{equation}
+
+I=I_{0}(1-\exp(-k\times LAI)) (\#eq:RadiationInterception-1)
+
+\end{equation}
+
+
+Extinction coefficient ($k$) varies with row spacing, 
+
+\begin{equation}
+
+k=h_{e}(W_{r})
+
+\end{equation}
+
+where $W_{r}$ is the row spacing which is specified by the user (in
+the APSIM interface, the .sim or .apsim file); $h_{e}$ is a function
+of rowing spacing which is defined for both green leaf and dead leaves
+by parameters `x_row_spacing`, `y_extinct_coef`
+in the wheat.xml file (Fig. \@ref(fig:wdRowExtinct)) and is linearly
+interpolated by APSIM. In the current version of APSIM-Wheat, no impact
+of row spacing is considered (Fig. \@ref(fig:wdRowExtinct))
+
+
+```{r wdRowExtinct,fig.cap='Values of extinction coefficient for different row spacings.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_row_spacing", 
+		c("y_extinct_coef",
+			'y_extinct_coef_dead'),
+		xlab = 'Row spacing (mm)',
+		ylab = 'Extinction coefficient (k)',
+		keylab = c('Green leaf', 'Dead leaf'),
+		keypos = c(0.9, 0.5))  
+print(p)
+
+```
+
+
+
+### Radiation use efficiency
+
+
+$RUE$ (g MJ$^{\text{-1}}$) is a function of growth stages which
+is defined by parameters `x_stage_rue` and `y_rue`
+in wheat.xml (Fig. \@ref(fig:wdRUE)) and linearly interpolated by APSIM.
+In the current version of APSIM-Wheat, $RUE$ equal to 1.24 from emergence
+to the end of grain-filling and does not vary as a function of daily
+incident radiation as in the model NWHEAT.
+
+
+```{r wdRUE,fig.cap='Radiation use efficiency (RUE) for different growth stages.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_stage_rue", "y_rue",
+		xlab = 'Stage code',
+		ylab = 'RUE') 
+print(p)
+
+```
+
+
+\subsubsection{Stress factor (Temperature, nitrogen, phosphorus (not applied), oxygen
+(not applied))}
+
+Actual daily radiation-limited biomass accumulation can be reduced
+by a stress factor ($f_{s}$, Equation \@ref(eq:BiomassProduction) and
+Equation \@ref(eq:BiomassProduction2)). This stress factor is the minimum
+value of a temperature factor ($f_{T,\ photo}$, Equation \@ref(eq:TemStressPhoto)),
+a nitrogen factor ($f_{N\ photo}$, Equation \@ref(eq:NStressPhoto)), a
+phosphorus factor ($f_{P\ photo}$) and an oxygen factor ($f_{O\ photo}$).
+
+\begin{equation}
+
+f_{s}=\min(f_{T,\ photo},\ f_{N,\ photo},\ f_{P,\ photo},\ f_{O,\ photo}) (\#eq:StressFactor4Photosynthesis)
+
+\end{equation}
+
+No phosphorus stress $f_{P,\,photo}$ and oxygen stress $f_{O,\,photo}$
+are applied in the current version of APSIM-Wheat. So, Equation \@ref(eq:StressFactor4Photosynthesis)
+is reduced to 
+
+\begin{equation}
+
+f_{s}=\min(f_{T,\ photo},\ f_{N,\ photo}) (\#eq:StressFactor4Photosynthesis2)
+
+\end{equation}
+
+
+
+\paragraph{The temperature factor}
+
+$f_{T,\ photo}$ is a function of the daily mean temperature and is
+defined by parameters `x_ave_temp` and `y_stress_photo`
+in the wheat.xml (Fig. \@ref(fig:wdTemperatureFactorOnPhoto)). Values
+are linearly interpolated by APSIM. The temperature stress is applied
+from sowing to harvest. 
+
+
+\begin{equation}
+
+f_{T,\ photo}=h_{T,\ photo}(\frac{T_{max}+T_{min}}{2}) (\#eq:TemStressPhoto)
+
+\end{equation}
+
+
+
+```{r wdTemperatureFactorOnPhoto,fig.cap='Temperature factor in response to mean daily temperature.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_ave_temp", "y_stress_photo",
+		xlab = expression(paste("Mean daily temperature", ~"("*degree*"C)")),
+		ylab = expression(Temperature~factor~(f[T])))
+print(p)
+
+```
+
+
+\paragraph{The nitrogen factor}
+
+$f_{N,\,photo}$ is determined by the difference between leaf nitrogen
+concentration and leaf minimum and critical nitrogen concentration.
+
+
+\begin{equation}
+
+f_{N,\,photo}=R_{N,\,photo}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}-C_{N,\,min}} (\#eq:NStressPhoto0)
+
+\end{equation}
+
+where $C_{N}$ is the nitrogen concentration of `Leaf` parts;
+$R_{N,\,expan}$ is multiplier for nitrogen deficit effect on phenology
+which is specified by `N_fact_photo` in the wheat.xml and
+default value is 1.5.
+
+\paragraph{The CO$_{\text{2}}$ factor}
+
+For C3 plants (like wheat), the CO$_{\text{2}}$ factor of APSIM is
+calculated by a function of environmental CO$_{\text{2}}$ concentration
+($C$, ppm) and daily mean temperature ($T_{mean}$) as published
+by \citet{reyenga1999modelling}
+
+
+\begin{equation}
+
+f_{c}=\frac{(C-C_{i})(350+2C_{i})}{(C+2C_{i})(350-C_{i})} (\#eq:CO2Factor4Photosynthesis)
+
+\end{equation}
+
+where $C_{i}$ is the temperature dependent CO$_{\text{2}}$ compensation
+point (ppm) and is derived from the following function. 
+
+\begin{equation}
+
+C_{i}=\frac{163-T_{mean}}{5-0.1T_{mean}}
+
+\end{equation}
+
+
+
+```{r wdCardonDioxideFactor,fig.cap='CO$_{2}$ factor in response to the CO$_{2}$ level ($C$) for different mean air temperatures.' }  
+
+p <- wdCarbonDioxideFactor()
+print(p)
+
+```
+
+
+\paragraph{Diffuse factor (not used in the current version)\label{par:Diffuse-factor}}
+
+The daily diffuse fraction was calculated using the functions suggested
+by \citet{roderick1999estimating}:
+
+
+\begin{equation}
+
+\begin{cases}
+\frac{R_{d}}{R_{s}}=Y_{0} & \qquad for\:\frac{R_{s}}{R_{o}}\leq X_{0}\\
+\frac{R_{d}}{R_{s}}=A_{0}+A_{1}\frac{R_{s}}{R_{o}} & \qquad for\:X_{0}<\frac{R_{s}}{R_{o}}\leq X_{1}\\
+\frac{R_{d}}{R_{s}}=Y_{1} & \qquad for\:\frac{R_{s}}{R_{o}}>X_{1}
+\end{cases} (\#eq:DiffuseFraction)
+
+\end{equation}
+
+where
+
+\begin{equation}
+
+\begin{array}{c}
+A_{0}=Y_{1}-A_{1}X_{1}\\
+A_{1}=\frac{Y_{1}-Y_{0}}{X_{1}-X_{0}}
+\end{array}
+
+\end{equation}
+
+where $R_{o}$ is the daily extra-terrestrial solar irradiance (i.e.
+top of the atmosphere); $R_{d}$ and $R_{s}$ are the daily diffuse
+and global solar irradiance at the surface, respectively. $X_{0}$,
+$X_{1}$, $Y_{0}$ and $Y_{1}$ are four empirical parameters.
+
+\begin{equation}
+
+\begin{array}{l}
+X_{0}=0.26,\qquad Y_{0}=0.96,\qquad Y_{1}=0.05,\;and\\
+X_{1}=0.80-0.0017|\varphi|+0.000044|\varphi|^{2}
+\end{array}
+
+\end{equation}
+
+where $\varphi$ is latitude. 
+
+$R_{o}$ is derived from this function
+
+\begin{equation}
+
+R_{0}=\frac{86400\times1360\times(\varpi\times\sin(\varphi)\times\sin(\theta)+\cos(\varphi)\times\cos(\theta)\times\sin(\varpi_{0}))}{1000000\pi}
+
+\end{equation}
+
+where $\varpi_{0}$ is the time of sunrise and sunset, which derives
+from any solar declination ($\theta$) and latitude ($\varphi$) in
+terms of local solar time when sunrise and sunset actually occur (\url{http://en.wikipedia.org/wiki/Sunrise_equation})
+
+\begin{equation}
+
+\varpi_{0}=\arccos(-\tan(\varphi)\tan(\theta))
+
+\end{equation}
+
+Solar declination ($\theta$) can be calculated by 
+
+\begin{equation}
+
+\theta=23.45\sin(\frac{2\pi}{365.25}(N-82.25))
+
+\end{equation}
+
+where $N$ is day of year. 
+
+$f_{d}$ is calculated by a function of the diffuse fraction which
+is not implemented in current wheat module, (i.e. $f_{d}$ = 1).
+
+
+## Actual daily biomass accumulation
+
+
+The actual daily biomass accumulation ($\Delta Q$) results from water
+limitation applied on the potential radiation-driven biomass accumulation
+($\Delta Q_{r}$). This water-limited biomass ($\Delta Q_{w}$) is
+a function of the ratio between the daily water uptake ($W_{u}$,
+Equation \@ref(eq:WaterUpdate)) and demand ($W_{d}$, Equation \@ref(eq:soilWaterDemand-1))
+capped by 
+
+\begin{equation}
+
+\Delta Q_{w}=\Delta Q_{r}f_{w,\,photo}=\Delta Q_{r}\frac{W_{u}}{W_{d}} (\#eq:WaterStressBiomassProduction-1)
+
+\end{equation}
+
+where $f_{w,\,photo}$ is the water stress factor affecting photosynthesis
+(Equation \@ref(eq:swstressphoto)); $W_{u}$ is the actual daily water
+uptake from the root system (which corresponds to the soil water supply
+($W_{s}$) capped by $W_{d}$), $W_{d}$ is the soil water demand
+of Leaf and Head parts (\autoref{sec:Crop-Water-Relations}). 
+
+When the soil water is non-limiting ($f_{w,\,photo}$ = 1, i.e. $W_{d}\geq W_{s}$),
+biomass accumulation is limited by the radiation ($\Delta Q=\Delta Q_{r}$,
+Equation \@ref(eq:actualBiomassProduction)). When the soil water is limiting,
+biomass accumulation is limited by water supply ($\Delta Q=\Delta Q_{w}$).
+
+The water demand ($W_{d}$, in mm) corresponds to the amount of water
+the crop would have transpired in the absence of soil water constraint,
+and is calculated from the potential biomass accumulation from RUE
+($\Delta Q_{r}$, Equation \@ref(eq:BiomassProduction)). Following \citet{sinclair1986waterand},
+transpiration demand is modeled as a function of the current day's
+crop growth rate, estimated by the potential biomass accumulation
+associated with intercepted radiation ($\Delta Q_{r}$, see Equation \@ref(eq:BiomassProduction)),
+divided by the transpiration efficiency. 
+
+
+\begin{equation}
+
+W_{d}=\frac{\Delta Q_{r}-R}{TE} (\#eq:soilWaterDemand-1)
+
+\end{equation}
+
+where $R$ is respiration rate and equals to zero in the current version
+of APSIM-Wheat, $TE$ is transpiration efficiency (Equation \@ref(eq:TranspirationEfficiency)).
+See \autoref{sec:Crop-Water-Relations} for more details about water
+demand and supply. \medskip
+
+The daily biomass accumulation ($\Delta Q$) corresponds to dry matter
+above ground biomass is limited by the radiation interception ($\Delta Q_{r}$,
+Equation \@ref(eq:BiomassProduction)) or by soil water deficiency ($\Delta Q_{w}$,
+Equation \@ref(eq:WaterStressBiomassProduction)), so that daily biomass
+accumulation can be expressed as: 
+
+\begin{equation}
+
+\Delta Q=\begin{cases}
+\Delta Q_{r}\qquad & W_{u}=W_{d}\\
+\Delta Q_{w}\qquad & W_{u}<W_{d}
+\end{cases} (\#eq:actualBiomassProduction)
+
+\end{equation}
+
+where $W_{s}$ is water supply, $W_{d}$ is the soil water demand
+from the shoot, limited by radiation interception ( Section @ref(Crop-water-demand)).
+In the current APSIM-Wheat, $W_{d}$ is actually only directly affected
+by the soil water demand of the leaf ( Section @ref(Crop-water-demand)).
+$W_{u}$ and $W_{d}$ are calculated by soil module of APSIM.

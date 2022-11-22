@@ -1,0 +1,345 @@
+# Nitrogen
+
+
+The nitrogen stress phase begins before 30\% floral initiation to
+finish at the 'harvest ripe' phase (Fig. \@ref(fig:PhenologWheatModule)),
+which are defined by `n_stress` in wheat.xml.
+
+
+## Nitrogen supply
+
+
+Ammonium ($\text{NH}_{4}^{+}$) is not taken up in wheat as wheat.xml
+parameter knh4 (constant for NH\textsubscript{4} extraction) is equal
+to 0. 
+
+The model uses a simplified formulation for nitrate $\text{NO}_{3}^{-}$
+uptake somewhat similar in structure to that employed in water uptake.
+During the nitrogen stress phase (Fig. \@ref(fig:PhenologWheatModule)),
+nitrogen supply for soil layer $i$ ($N_{s}(i)$, g m\textsuperscript{-2})
+is calculated as follows:
+
+
+\begin{equation}
+
+N_{s}(i)=K_{NO3}N(i)[N(i)\frac{1000}{\text{BD}(i)D_{s}(i)}]\frac{\text{\text{ESW}}_{a}(i)}{\text{ESW}_{p}(i)}
+
+\end{equation}
+
+where $K_{NO3}$ is a constant of extractable soil nitrogen, which
+is defined by `kno3` with default value 0.02; $N(i)$ is the
+$\text{NO}_{3}^{-}$concentration in soil layer $i$ (g m\textsuperscript{-2});
+$\text{BD}(i)$ is the bulk density of soil layer $i$ (g cm\textsuperscript{-3});
+$D_{s}(i)$ is the depth of soil layer $i$ (cm); $\text{ESW}_{a}(i)$
+is the actual extractable soil water in soil layer $i$ (Equation \@ref(eq:SoilWaterESW));
+$\text{ESW}_{p}(i)$ is the potential extractable soil water in
+soil layer $i$ (Equation \@ref(eq:SoilWaterESW)). 
+
+During non-nitrogen stress phase (Fig. \@ref(fig:PhenologWheatModule)),
+wheat could access to all available nitrogen. 
+
+\begin{equation}
+
+N_{s}(i)=N(i)\frac{1000}{\text{BD}(i)D_{s}(i)} (\#eq:NitrogenSupply)
+
+\end{equation}
+
+
+The values of $N_{s}(i)$ for each layer of root presented are summed
+to get a total potential nitrogen uptake (or crop N supply, $N_{s}$)
+and then each layer $N_{s}(i)$ is scaled by maximum total nitrogen
+uptake ($N_{s,\,max}$), which is defined by `total_n_uptake_max`
+ with default value 0.6 g m\textsuperscript{-2}.
+
+\begin{equation}
+
+N_{s}'(i)=N_{s}(i)\frac{N_{s,\,max}}{N_{s}}
+
+\end{equation}
+
+where $N_{s}'(i)$ is the actual nitrogen uptake in the layer $i$.
+
+
+## Nitrogen demand
+
+
+Total wheat nitrogen demand is the sum of the N demand in all parts
+(i.e. `Leaf`, `Stem`, and `Pod`). Wheat has a
+defined minimum ($C_{N,\,min}$), critical ($C_{N,\,crit}$) and maximum
+($C_{N,\,max}$) nitrogen concentration for all plant parts (Fig. \@ref(fig:wdNitrogenConcentration)).
+These concentration limits change with phenological stages (Fig. \@ref(fig:wdNitrogenConcentration)).
+And they are defined by parameters `x_stage_code`, `y_n_conc_min_leaf`,
+`y_n_conc_crit_leaf`, `y_n_conc_max_leaf`, `y_n_conc_min_stem`,
+`y_n_conc_crit_stem`, \texttt{y_n_conc_max_stem, y_n_conc_min_pod,
+y_n_conc_crit_pod, y_n_conc_max_pod} in wheat.xml and linearly
+interpolated by APSIM .
+
+Physiologically, minimum nitrogen concentration ($C_{N,\,min}$) corresponds
+to the structural N required for the plant structure, and which cannot
+be re-translocated. Critical nitrogen concentration ($C_{N,\,crit}$)
+corresponds to the minimum concentration of N that plant parts will
+attempt to maintain (it drives the `N demand`
+of the part), and maximum nitrogen concentration ($C_{N,\,max}$)
+reflects to the capacity of the part to accumulate the extra available
+N (i.e. fulfilling more than its `demand`)
+up to a this maximum threshold N.
+
+
+```{r wdNitrogenConcentration,fig.height=6,fig.cap='Relationship between maximum, critical, minimum nitrogen concentration and growth stages for the different plant parts (Leaf, Stem and Pod). Parameters are defined by defined by parameters x_stage_code, y_n_conc_min_leaf, y_n_critonc_crit_leaf, y_n_conc_max_leaf, y_n_conc_min_stem, y_n_critonc_crit_stem, y_n_critonc_max_stem in wheat.xml.' }  
+
+p <- wdNitrogenConcentration()
+print(p$pod, position = c(0, 0, 1, 0.35), more = TRUE)
+print(p$stem, position = c(0, 0.31, 1, 0.68), more = TRUE)
+print(p$leaf, position = c(0, 0.65, 1, 1))
+
+```
+
+
+
+### Nitrogen demand of `Grain`
+
+
+`Grain` nitrogen demand starts at anthesis and is calculated
+from grain number, thermal time and a potential grain nitrogen filling
+rate (g grain\textsuperscript{-1} $^{\circ}$Cd\textsuperscript{-1}).
+
+\begin{equation}
+
+N_{D,\;grain}=N_{g}\,R_{N,\,poten,}\,f_{N,\;grain}\,h_{grain}(T) (\#eq:NitrogenDemand)
+
+\end{equation}
+
+where $N_{g}$ is the grain number, $R_{N,\,poten,}$ is the potential
+nitrogen filling rate, which is defined by parameter `potential_grain_n_filling_rate`
+in wheat.xml with default value 0.000055 g grain\textsuperscript{-1}
+d\textsuperscript{-1}. $f_{N,\;grain}$ is the nitrogen factor of
+grain filling (Equation \@ref(eq:NStressFilling)). $h_{grain}(T)$ is a
+function of daily mean temperature ($T$) to influence of grain filling
+(Fig. \@ref(fig:wdNitrogenTem)).
+
+
+```{r wdNitrogenTem,fig.cap='Relationship between nitrogen demand of Grain and daily mean temperature.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_temp_grain_n_fill", "y_rel_grain_n_fill",
+		xlab = expression(paste("Daily mean temperature", ~"("*degree*"C)")),
+		ylab = 'Temperature factor to nitrogen demand of grain')
+print(p)
+
+```
+
+
+
+### Nitrogen demand of other parts
+
+
+Demand of nitrogen in each part (except Grain) attempts to maintain
+nitrogen at the critical (non-stressed) level. Nitrogen demand on
+any day is the sum of the demands from the pre-existing biomass of
+each part required to reach critical nitrogen content, plus the nitrogen
+required to maintain critical nitrogen concentrations in that day's
+produced biomass. For each plant part (`Leaf`, `Stem`,
+and `Pod`) the nitrogen demand is given by:
+
+
+\begin{equation}
+
+N_{D,\;crit}=\frac{\Delta Q_{part}C_{N,\,crit}}{f_{w,\,photo}}+f_{n}(C_{N,\,crit}-C_{N,\,part})\qquad if\:C_{N,\,crit}>C_{N,\,part}\;\&\;Q_{part}>0
+
+\end{equation}
+
+
+
+\begin{equation}
+
+N_{D,\;max}=\frac{\Delta Q_{part}C_{N,\,max}}{f_{w,\,photo}}+f_{n}(C_{N,\,max}-C_{N,\,part})\qquad if\:C_{N,\,max}>C_{N,\,part}\;\&\;Q_{part}>0
+
+\end{equation}
+
+where $\Delta Q_{part}$ is the growth dry weight of parts, $Q_{part}$
+is the green (i.e. not senesced) dry weight of parts, $f_{w,\,photo}$
+is soil water stress of biomass accumulation (Equation \@ref(eq:swstressphoto));
+$C_{N,\,part}$ is the nitrogen concentration of parts; $f_{n}$ is
+defined by parameter `n_deficit_uptake_fraction` in wheat.xml
+with default value 0.0001. $C_{N,\,crit}$ and $C_{N,\,max}$ are
+the N concentration critic and maximal of the parts, respectively
+(Fig. \@ref(fig:wdNitrogenConcentration)). $N_{D,\;crit}$
+and $N_{D,\;max}$ equal to 0, if $Q_{part}=0$.
+
+
+## Nitrogen uptake, partitioning and re-translocation
+
+
+
+### Nitrogen concentrations in wheat parts
+
+
+The N concentration in Leaf is calculated as follows:
+
+\begin{equation}
+
+C_{N,\,leaf}=N_{leaf}/Q_{leaf}
+
+\end{equation}
+
+
+
+
+### Nitrogen uptake
+
+
+Daily total nitrogen uptake ($N_{u}$) is the lesser of N demand ($N_{d}$,
+Equation \@ref(eq:NitrogenDemand)) and N supply $N_{s}$, Equation \@ref(eq:NitrogenSupply)).
+
+
+\begin{equation}
+
+N_{u}=\text{min}(N_{d},\;N_{s})
+
+\end{equation}
+
+
+
+
+### Nitrogen translocation
+
+
+Daily total nitrogen uptake is distributed to the plant parts in proportion
+to their individual demands. 
+
+
+### Nitrogen re-translocation 
+
+
+If there is insufficient nitrogen supplied from senescing material
+and soil nitrogen uptake, Grain nitrogen demand is met by re-translocating
+nitrogen from other plant parts. Nitrogen is available for re-translocation
+from un-senesced leaves and stems until they reach their defined minimum
+nitrogen concentration. No N re-translocation is attributed to other
+parts than `Grain`. 
+
+
+## Nitrogen stresses
+
+
+
+### Phenology
+
+
+Nitrogen stress on phenology (via $f_{N,\,pheno}$ in Equation \@ref(eq:CumThermalTime))
+is determined by the difference between organ nitrogen concentration
+and organ minimum and critical nitrogen concentration.
+
+
+\begin{equation}
+
+f_{N,\,pheno}=h_{N,\,pheno}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}} (\#eq:NitrogenStress)
+
+\end{equation}
+
+where $C_{N}$ is the nitrogen concentration of `Stem` or `Leaf`
+parts; $h_{N,\,pheno}$ is multiple for nitrogen deficit effect on
+phenology which is specified by `N_fact_pheno` in the wheat.xml
+and default value is 100; $C_{N,\,crit}$ and $C_{N,\,min}$ are the
+N concentration critic and minimal of the parts, respectively (Fig. \@ref(fig:wdNitrogenConcentration));
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for `Leaf` (Fig. \@ref(fig:wbCO2CritLeaf)).
+
+The nitrogen stress on phenology is used in the calculation of the
+`adjusted` thermal time (Equation \@ref(eq:CumThermalTime)).
+However, In the current version of APSIM-Wheat module, the default
+parameters are applied for no nitrogen water stress for phenology. 
+
+
+### Biomass accumulation
+
+
+Nitrogen stress on biomass accumulation (via $f_{N,\,photo}$ in Equation \@ref(eq:StressFactor4Photosynthesis))
+is determined by the difference between leaf nitrogen concentration
+and leaf minimum and critical nitrogen concentration.
+
+
+\begin{equation}
+
+f_{N,\,photo}=h_{N,\,photo}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}} (\#eq:NStressPhoto)
+
+\end{equation}
+
+where $C_{N}$ is the nitrogen concentration of `Leaf` parts;
+$h_{N,\,photo}$ is multiplier for nitrogen deficit effect on photosynthesis
+which is specified by `N_fact_photo` in the wheat.xml and
+default value is 1.5; $C_{N,\,crit}$ and $C_{N,\,min}$ are the N
+concentration critic and minimal of the parts, respectively (Fig. \@ref(fig:wdNitrogenConcentration));
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for `Leaf` (Fig. \@ref(fig:wbCO2CritLeaf)).
+
+The nitrogen stress on biomass accumulation affects the radiation-limited
+biomass accumulation ($\Delta Q_{r}$, Equation \@ref(eq:actualBiomassProduction)). 
+
+
+### Leaf appearance and expansion (i.e. leaf number and LAI)
+
+
+Nitrogen stress on leaf appearance and expansion (via $f_{N,\,expan}$
+in Equation \@ref(eq:LeafExpansionStress)) is determined by the difference
+between leaf nitrogen concentration and leaf minimum and critical
+nitrogen concentration.
+
+
+\begin{equation}
+
+f_{N,\,expan}=h_{N,\,expan}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}} (\#eq:NStressLeafExpansion)
+
+\end{equation}
+
+where $C_{N}$ is the nitrogen concentration of `Leaf` parts;
+$h_{N,\,expan}$ is multiplier for nitrogen deficit effect on expansion
+which is specified by `N_fact_expansion` in the wheat.xml
+(default value 1); $C_{N,\,crit}$ and $C_{N,\,min}$ are the N concentration
+critic and minimal of the parts, respectively (Fig. \@ref(fig:wdNitrogenConcentration));
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for `Leaf` (Fig. \@ref(fig:wbCO2CritLeaf)).
+
+The nitrogen stress on leaf appearance and expansion affects the potential
+leaf number ($N_{d,\,pot}$; Equation \@ref(eq:PotentialNodeNumberDaily))
+and the stressed leaf area index ($\Delta\text{LAI}_{d,\,s}$, Equation \@ref(eq:StressLeafArea)). 
+
+
+### Grain filling (biomass and nitrogen demand of grain)
+
+
+Nitrogen stress on grain filling affects the biomass demand of `Grain`
+(via $f_{N,\,grain}$ in Equation \@ref(eq:MealDemand)) and the N demand
+of `Grain` (Equation \@ref(eq:NitrogenDemand)). 
+
+The nitrogen factor $f_{N,\,grain}$ (that impacts N demand of grain)
+is determined by the difference between organ nitrogen concentration
+and organ minimum and critical nitrogen concentration as follows:.
+
+
+\begin{equation}
+
+f_{N,\,grain}=\frac{h_{N,\ poten}}{h_{N,\ min}}h_{N,\,grain}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\qquad(0\leq f_{N,\,fill}\leq1) (\#eq:NStressFilling)
+
+\end{equation}
+
+where $h_{N,\ poten}$ is the potential rate of grain filling which
+is specified by `potential_grain_n_filling_rate` in wheat.xml
+and has a default value of 0.000055 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\ min}$ is the minimum rate of grain filling which is specified
+by `minimum_grain_n_filling_rate` in wheat.xml and has
+a default value of 0.000015 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\,grain}$ is a multiplier for nitrogen deficit effect on grain,
+which is specified by `n_fact_grain` in wheat.xml and has
+a default value of 1; $C_{N}$ is the nitrogen concentration of `Stem`
+or `Leaf` parts; $C_{N,\,crit}$ and $C_{N,\,min}$ are critical
+and minimum nitrogen concentration, respectively, for `Stem`
+and `Leaf` parts. $C_{N,\,crit}$ and $C_{N,\,min}$ are functions
+of growth stage and nitrogen concentration which is defined by parameters
+`x_stage_code`, `y_n_conc_min_leaf`, `y_n_conc_crit_leaf`,
+`y_n_conc_min_stem`, `y_n_conc_crit_stem` in
+wheat.xml and linearly interpolated by APSIM (Fig. \@ref(fig:wdNitrogenConcentration));
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for `Leaf` (Fig. \@ref(fig:wbCO2CritLeaf)).
+
+

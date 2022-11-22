@@ -1,0 +1,156 @@
+
+
+# Head development
+
+
+
+## Grain number
+
+
+The number of grains per plant ($N_{g}$) is determined by the stem
+weight at anthesis.
+
+\begin{equation}
+
+N_{g}=R_{g}W_{s}
+
+\end{equation}
+
+where $W_{s}$ is the stem dry weight at anthesis, $R_{g}$ is the
+grain number per gram stem which is specified by `grain_per_gram_stem`
+in wheat.xml, with default value at 25 grain g\textsuperscript{-1}.
+
+
+## `Grain` (`Meal`) demand\label{subsec:Grain-(meal)-demand}
+
+
+The `Grain` demand (or `Meal` demand, $D_{g}$) is calculated
+in the growth phase `postflowering` (from flowering to end
+of grain filling Fig. \@ref(fig:PhenologWheatModule)). $D_{g}$ equals
+to 0 before flowering.
+
+
+\begin{equation}
+
+D_{g}=N_{g}R_{p}h_{g}(T_{mean})f_{N,\,grain} (\#eq:MealDemand)
+
+\end{equation}
+
+where $N_{g}$ is the grain number, $R_{p}$ is the potential rate
+of grain filling (0.0010 grain\textsuperscript{-1} d\textsuperscript{-1}
+from flowering to start of grain filling (Fig. \@ref(fig:PhenologWheatModule));
+0.0020 grain\textsuperscript{-1} d\textsuperscript{-1} during grain
+filling (Fig. \@ref(fig:PhenologWheatModule))), $h_{g}(T_{mean})$
+is a function of daily mean temperature which affects the rate of
+grain filling (0-1) and is defined by parameters `x_temp_grainfill`
+and `y_rel_grainfill` in wheat.xml and linearly interpolated
+by APSIM (Fig. \@ref(fig:wdTempGrainFill)).
+
+$f_{N,\,grain}$ is a nitrogen factor to grain filling.
+
+
+\begin{equation}
+
+f_{N,\,grain}=\frac{h_{N,\ poten}}{h_{N,\ min}}h_{N,\,grain}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\qquad(0\leq f_{N,\,fill}\leq1)
+
+\end{equation}
+
+where $h_{N,\ poten}$ is the potential rate of grain filling which
+is specified by `potential_grain_n_filling_rate` in wheat.xml
+and has a default value of 0.000055 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\ min}$ is the minimum rate of grain filling which is specified
+by `minimum_grain_n_filling_rate` in wheat.xml and has
+a default value of 0.000015 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\,grain}$ is a multiplier for nitrogen deficit effect on grain,
+which is specified by `n_fact_grain` in wheat.xml and has
+a default value of 1; $C_{N}$ is the nitrogen concentration of `Stem`
+or `Leaf` parts; $C_{N,\,crit}$ and $C_{N,\,min}$ are critical
+and minimum nitrogen concentration, respectively, for `Stem`
+and `Leaf` parts. $C_{N,\,crit}$ and $C_{N,\,min}$ are functions
+of growth stage and nitrogen concentration which is defined by parameters
+`x_stage_code`, `y_n_conc_min_leaf`, `y_n_conc_crit_leaf`,
+`y_n_conc_min_stem`, `y_n_conc_crit_stem` in
+wheat.xml and linearly interpolated by APSIM (Fig. \@ref(fig:wdNitrogenConcentration));
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for `Leaf` (Fig. \@ref(fig:wbCO2CritLeaf)).
+
+
+```{r wdTempGrainFill,fig.cap='Response of the factor affecting the rate of grain filling in regards to daily mean temperature.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_temp_grainfill", "y_rel_grainfill",
+		xlab = expression(paste("Daily mean temperature", ~"("*degree*"C)")),
+		ylab = 'Factor affecting the rate of grain filling')
+
+print(p)
+
+```
+
+
+
+```{r wbCO2CritLeaf,fig.cap='The CO2 modifier for critical nitrogen concentration of Leaf.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_co2_nconc_modifier", "y_co2_nconc_modifier",
+		xlab = 'CO2 concentration',
+		ylab = 'Critical nitrogen concentration of Leaf')
+
+print(p)
+
+```
+
+
+Finally, `Grain` demand is limited by the maximum grain size
+(corresponding to $D_{gm}$)
+
+\begin{equation}
+
+\begin{array}{c}
+D_{g}=\min(D_{g},\,D_{gm})\\
+D_{gm}=N_{g}S_{gm}-Q_{meal}\qquad(D_{gm}\geq0)
+\end{array}
+
+\end{equation}
+
+where $N_{g}$ is the grain number; $Q_{meal}$ is the dry weight
+of `Meal` part (i.e. the `Grains`); $S_{gm}$ is the
+maximum grain size which is specified by max_grain_size in wheat.xml
+and is a cultivar-specific parameter with 0.04 g for default value.
+
+
+## `Pod` demand\label{subsec:Pod-demand}
+
+
+`Pod` demand ($D_{p}$) is calculated by `Grain` demand
+($D_{g}$, Equation \@ref(eq:MealDemand)) or daily biomass accumulation
+($\Delta Q$, Equation \@ref(eq:actualBiomassProduction))
+
+
+\begin{equation}
+
+D_{p}=\begin{array}{c}
+D_{g}h_{p}(S)\qquad D_{g}\text{>0}\\
+\Delta Qh_{p}(S)\qquad D_{g}\text{=0}
+\end{array} (\#eq:GrainDemand)
+
+\end{equation}
+
+where $h_{p}(S)$ is a function of the growth stage ($S$) and of
+the `Pod` demand fraction of $D_{g}$ or $\Delta Q$. $h_{p}(S)$
+is defined by parameters `x_stage_no_partition` and `y_frac_pod`
+in wheat.xml and linearly interpolated by APSIM (Fig. \@ref(fig:wdFractionOfPod)).
+
+
+```{r wdFractionOfPod,fig.cap='Pod demand over the stages (fraction of Grain demand or of  daily biomass accumulation).' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_stage_no_partition", "y_frac_pod",
+		xlab = "Stage codes",
+		ylab = "Pod demand fraction of grain demand \n or daily biomass accumulation")
+
+print(p)
+
+```
+
+
+

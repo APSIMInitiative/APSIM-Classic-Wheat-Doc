@@ -1,0 +1,22 @@
+# Temperature 
+
+
+As mentioned in previous sections, the temperature affects:
+
+* crop phenology via the thermal time ($\Delta TT$; Equation \@ref(eq:thermaltime))
+and crop vernalisation ($f_{V}$; Equation \@ref(eq:VernalisationFactor)),
+and via crop emergence (Equation \@ref(eq:Emergence)), 
+* root depth growth ($f_{rt}$; Equation \@ref(eq:RootGrowthTemperature);
+Fig. \@ref(fig:wdTempRootFactor)), 
+* radiation-limited biomass accumulation ($\Delta Q_{r}$; Equation \@ref(eq:BiomassProduction))
+via a stress factor ($f_{s}$), which depends on a temperature factor
+($f_{T,photo}$; Equation \@ref(eq:TemStressPhoto)), 
+* CO\textsubscript{2} effect on biomass accumulation via a temperature
+effect on the CO\textsubscript{2} compensation point $(C_{i}$; Equation \@ref(eq:CO2Factor4Photosynthesis);
+Fig. \@ref(fig:wdCardonDioxideFactor)), 
+\item LAI senescence under minimum and maximum temperature ($\Delta LAI_{sen,\,frost}$,
+$\Delta LAI_{sen,\,heat}$; Equation \@ref(eq:SensFrost) and Equation \@ref(eq:SensHeat)),
+* biomass demand of `Grain` ($D_{g}$) and the rate of grain
+filling (Equation \@ref(eq:MealDemand); Fig. \@ref(fig:PhenologWheatModule)), 
+* N demand of `Grain` (Equation \@ref(eq:NitrogenDemand); Fig. \@ref(fig:wdNitrogenTem)), 
+** VPD calculation (Equation \@ref(eq:VPD)). 

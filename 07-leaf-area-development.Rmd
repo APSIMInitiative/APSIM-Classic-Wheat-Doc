@@ -1,0 +1,176 @@
+
+# Leaf and node appearance and crop leaf area
+
+
+In the current version of APSIM-Wheat, wheat plants are assumed to
+be uniclum (i.e. with a single stem), meaning that tillering is not
+simulated \textit{per se}. While a node corresponds to a phytomer
+on the main stem, it actually represents all the phytomers that appear
+simultaneously on different tillers (i.e. cohort of leaves) in the
+real world.
+
+
+## Node number
+
+
+
+### Potential node appearance rate
+
+
+At emergence (Fig. \@ref(fig:PhenologWheatModule)), a number of initial
+leaves are specified by `leaf_no_at_emerg,` with a default
+value of 2. The initial number of nodes is the same as the initial
+number of leaves. 
+
+During the tiller formation phase (i.e. up to 'Harvest rips', Fig. \@ref(fig:PhenologWheatModule)),
+nodes appear at a thermal time interval (the equivalent of a phyllochron
+for leaf appearance, $P_{n}$) that depends on the node number of
+the main stem ($n_{d}$, i.e. total number of nodes of the plant)
+at days after sowing ($d,$ days).
+
+\begin{equation}
+
+P_{n}=h_{P}(n_{d}) (\#eq:phyllochron)
+
+\end{equation}
+
+where the function $h_{P}(n_{d})$ is defined by parameters `x_node_no_app`
+and `y_node_app_rate` in wheat.xml and is linearly interpolated
+by APSIM. In the current version of APSIM-Wheat, $P_{n}$ is set to
+95 $^{\circ}\text{C}$ d, meaning that the 'node phyllochron' is supposed
+to be constant (Fig. \@ref(fig:wdPhyllochron)). No effect from water
+and N stress on leaf appearance is accounted for.
+
+
+```{r wdPhyllochron,fig.cap="Relationship function ($h_{p}(n_{d})$) between 'node phyllochron' ($P_{n}$) and the node number at main stem ($n_{d}$)." }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_node_no_app", "y_node_app_rate",
+		xlab = "Node number at main stem",
+		ylab = expression(paste("'Node Phyllochron", ~"("*degree*"Cd)'")))
+
+print(p)
+
+```
+
+
+
+### Potential node number (daily increase)
+
+
+The potential daily increase in the node number of this unique stem
+($\Delta n_{d,\,p}$) is calculated by the daily thermal time (Fig. \@ref(fig:wdThermalTime))
+and the 'node phyllochron', and occurs during the tiller formation
+phase (Fig. \@ref(fig:PhenologWheatModule)). 
+
+\begin{equation}
+
+\Delta n_{d,\,p}=\frac{\Delta TT_{d}}{P_{n}} (\#eq:PotentialNodeNumber)
+
+\end{equation}
+
+where $\Delta TT_{d}$ is the thermal time ($^{\circ}\text{C}$d)
+at day $d$ (Fig. \@ref(fig:wdThermalTime) and Equation \@ref(eq:thermaltime)).
+
+
+
+## Leaf number
+
+
+
+### Potential leaf number (daily increase)
+
+
+In the current version of APSIM-Wheat, all leaves appeared from a
+main and unique stem. The potential leaf number of each node is defined
+by a function ($h_{l}(n_{d})$) of node ($n_{d}$) number of day $d$
+(or 'node position'; $n_{d}$) (Fig. \@ref(fig:wdTillerNumberByNode)
+and Equation \@ref(eq:LeafExpansionStress)). $h_{l}(n_{d})$ is specified
+by parameters `x_node_no_leaf` and `y_leaves_per_node`
+in wheat.xml and linearly interpolated by APSIM.
+
+At day $d$, the leaf number of the current node $n_{d}$ nodes ($N_{n,\,d,\,p}$)
+is determined by the potential leaf number $d-1$ for the past $n_{d-1}$
+nodes ($N_{n,\,d-1}$) and environmental stresses.
+
+
+\begin{equation}
+
+N_{d,\,p}=\min[N_{n,\,d-1},\;h_{l}(n_{d-1})]+[h_{l}(n_{d-1}+\Delta n_{d,\,p})-h_{l}(n_{d-1})]\times f_{S,\,expan} (\#eq:PotentialNodeNumberDaily)
+
+\end{equation}
+
+where $n_{d-1}$ is the node number at $d-1$ days after sowing, $\Delta n_{d,\,p}$
+is the potential daily increase of node number (Equation \@ref(eq:PotentialNodeNumber)),
+$f_{S,\,expan}$ is the environmental stresses for canopy expansion.
+
+
+\begin{equation}
+
+f_{S,\,expan}=\min\{[\min(f_{N,\,expan},\;f_{p,\,expan})]^{2},\;f_{w,\,expan}\} (\#eq:LeafExpansionStress)
+
+\end{equation}
+
+where $f_{N,\,expan}$, $f_{p,\,expan}$ and $f_{w,\,expan}$ are
+the nitrogen, phosphorus and soil water stress for canopy expansion,
+respectively, which is explained in  Section @ref(Phosphorus-stress)
+and Equation \@ref(eq:WaterStressLeafExpansion), respectively. 
+
+The potential daily increase in leaf number for the whole plant is
+calculated based on the potential increase for the current node and
+the potential increase in node number ($\Delta n_{d,\,p}$, Equation \@ref(eq:PotentialNodeNumber))
+as follows.
+
+
+\begin{equation}
+
+\Delta N_{d,\,p}=N_{n,\,d}\times\Delta n_{d,\,p}
+
+\end{equation}
+
+
+
+```{r wdTillerNumberByNode,fig.cap='Number of leaves per node as a function of the number of nodes on the main stem and unique stem considered in APSIM-Wheat ($n_{d}$). This relation corresponds the function $h_{l}(n_{d})$.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_node_no_leaf", "y_leaves_per_node",
+		xlab = "Node number on the main stem",
+		ylab = "Number of leaves per node")
+print(p)
+
+```
+
+
+
+### Actual leaf number (daily increase)
+
+
+The increase in actual leaf number ($\Delta N_{d,\ LAI}$) is calculated
+in relation to the fraction between the actual and stressed increase
+of leaf area index, as follow:
+
+
+\begin{equation}
+
+\Delta N_{d,\,LAI}=\Delta N_{d,\,p}\times h_{LAI}(\frac{\Delta\text{LAI}_{d}}{\Delta\text{LAI}_{d,\,s}}) (\#eq:ActualLeafNumber)
+
+\end{equation}
+
+where $h_{LAI}$ is a function between the fraction of leaf area index
+and the fraction of leaf number which is defined by parameters \hyperlink{x_lai_ratio}{x_lai_ratio}  
+and \hyperlink{y_leaf_no_frac}{y_leaf_no_frac}   in the wheat.xml
+and linearly interpolated by APSIM (Fig. \@ref(fig:wdLAINodeNumber)).
+
+
+```{r wdLAINodeNumber,fig.cap='Relationship between fraction of leaf area index and fraction of leaf number.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_lai_ratio", "y_leaf_no_frac",
+		xlab = 'Fraction of leaf area index',
+		ylab = 'Fraction of leaf number')
+print(p)
+
+```
+
+
+

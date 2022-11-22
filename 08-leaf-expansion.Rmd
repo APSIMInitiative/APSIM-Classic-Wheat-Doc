@@ -1,0 +1,125 @@
+# Leaf area expansion
+
+
+
+## Actual leaf area (daily increase)
+
+
+At emergence (Fig. \@ref(fig:PhenologWheatModule)), an initial leaf
+area is specified for each plant by `initial_tpla`, with a
+default value of 200 mm\textsuperscript{2} plant\textsuperscript{-1}. 
+
+During the tiller formation phase (Fig. \@ref(fig:PhenologWheatModule)),
+the daily increase in leaf area index ($\Delta\text{LAI}_{d}$) is
+the minimum between `stressed` leaf
+area index ($\Delta\text{LAI}_{d,\,s}$) and the carbon-limited leaf
+area index ($\Delta\text{LAI}_{d,\,c}$). 
+
+
+\begin{equation}
+
+\Delta\text{LAI}_{d}=\min(\Delta\text{LAI}_{d,\,s},\;\Delta\text{LAI}_{d,\,c})
+
+\end{equation}
+
+
+
+
+##  Stressed leaf area
+
+
+During the tiller formation phase, the `stressed` daily increase
+in leaf area ($\Delta LAI_{d,s}$) is calculated as the potential
+increase in LAI reduced by environmental factors.
+
+\begin{equation}
+
+\Delta\text{LAI}_{d,\,s}=\Delta\text{LAI}_{d,\,p}\times\min(f_{w,\;expan},\,f_{N,\,expan},\,f_{P,\,expan}) (\#eq:StressLeafArea)
+
+\end{equation}
+
+where $f_{N,\,expan}$, $f_{p,\,expan}$ and $f_{w,\,expan}$ are
+the nitrogen, phosphorus and soil water stress factors concerning
+canopy expansion, respectively (Equation \@ref(eq:NStressLeafExpansion),
+ Section @ref(Phosphorus-stress) and Equation \@ref(eq:WaterStressLeafExpansion)).
+
+The potential daily increase of leaf area ($\Delta\text{LAI}_{d,\,p}$)
+is calculated by the potential daily increase in leaf number and leaf
+size. 
+
+
+\begin{equation}
+
+\Delta\text{LAI}_{d,\,p}=\Delta N_{d,\,p}\times L_{n}\times D_{p}
+
+\end{equation}
+
+where $\Delta N_{d,\,p}$ is the potential increase in leaf number
+(for the whole plant), $D_{p}$ is the plant population, and $L_{n}$
+is the potential leaf area for leaves of the `current` node (this
+corresponds to the new potential leaf area produced by the different
+tillers in the real world) and depends on the node number on the main
+and unique stem considered by APSIM-Wheat.
+
+\begin{equation}
+
+L_{n}=h_{ls}(n_{d}+n_{0})
+
+\end{equation}
+
+where $n_{0}$ is the growing leaf number in the sheath (`node_no_correction`
+in wheat.xml) and equals to 2 as default value. The function $h_{ls}(n_{d})$
+is defined by parameters `x_node_no` and `y_leaf_size`
+in wheat.xml and linearly interpolated by APSIM (Fig. \@ref(fig:wdLeafSizeByNode)).
+
+
+```{r wdLeafSizeByNode,fig.cap='Leaf area per node ($L_{n}$) in regards to the main stem node number $n_{0} + n_{d}$.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_node_no", "y_leaf_size ",
+		xlab = "Main stem node number",
+		ylab = expression(paste("Potential leaf area per node", ~"("*mm^2*")")))
+print(p)
+
+```
+
+
+
+## Carbon-limited leaf area
+
+
+Leaf area related to carbon production is calculated by the increase
+in leaf dry weight ($\Delta Q_{leaf}$ Equation \@ref(eq:actualBiomassProduction))
+and the maximum specific leaf area ($\text{SLA}_{max}$), which is
+related to leaf area index (LAI).
+
+
+\begin{equation}
+
+\Delta\text{LAI}_{d,\,c}=\Delta Q_{leaf}\times\text{SLA}_{max}
+
+\end{equation}
+
+
+\begin{equation}
+
+\text{SLA}_{max}=h_{SLA}(\text{LAI})
+
+\end{equation}
+
+This function is defined by parameters `x_lai` and `y_sla_max`
+in wheat.xml and linearly interpolated by APSIM (Fig. \@ref(fig:wdSLA)).
+
+
+```{r wdSLA,fig.cap='Relationship between maximum specific leaf area and leaf area index.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_lai", "y_sla_max",
+		xlab = expression(paste("Leaf area index", ~"("*mm^2*" "*mm^{-2}*")")),
+		ylab = expression(paste("Maximum specific leaf area", ~"("*mm^2*" "*g^{-1}*")")))
+print(p)
+
+```
+
+
+

@@ -1,0 +1,202 @@
+# Senescence
+
+
+
+## Leaf number senescence
+
+
+The leaf senescence phase begins 40\% between floral initiation and
+end of juvenile, and ends at harvest ripe (Fig. \@ref(fig:PhenologWheatModule)),
+at which stage, all green leaves are dead. During leaf senescence
+phase (Fig. \@ref(fig:PhenologWheatModule)), leaf number senescence
+is calculated by daily thermal time ($\Delta TT$, Equation \@ref(eq:thermaltime))
+as follows:
+
+\begin{equation}
+
+\Delta N_{d,\,sen}=\Delta TT\times\frac{f_{sen,\,l}\times N_{d}}{r_{sen,\,l}}
+
+\end{equation}
+
+where $N_{d}$ is the total leaf number; $f_{sen,\,l}$ is the fraction
+of the total leaf number senescing per main stem node and specified
+by `fr_lf_sen_rate` in wheat.xml (default value 0.035);
+$r_{sen,\,l}$ is the rate of node senescence on main stem and specified
+by `node_sen_rate` in wheat.xml (default value 60.0 $^{\circ}$Cd
+node\textsuperscript{-1}). 
+
+
+## Leaf area senescence
+
+
+There are five causes of leaf senescence: age ($\text{\ensuremath{\Delta}LAI}_{sen,\,age}$),
+water stress ($\text{\ensuremath{\Delta}LAI}_{sen,\,sw}$), light
+intensity ($\text{\ensuremath{\Delta}LAI}_{sen,\,light}$), frost
+($\text{\ensuremath{\Delta}LAI}_{sen,\,frost}$) and heat ($\text{\ensuremath{\Delta}LAI}_{sen,\,heat}$).
+The maximum of these causes is the day's total leaf area index senescence.
+
+\begin{equation}
+
+\text{\ensuremath{\Delta}LAI}_{sen}=\max(\text{\ensuremath{\Delta}LAI}_{sen,\,age},\;\text{\ensuremath{\Delta}LAI}_{sen,\,sw},\;\Delta\text{LAI}_{sen,\,light},\;\text{\ensuremath{\Delta}LAI}_{sen,\,frost},\;\text{\ensuremath{\Delta}LAI}_{sen,\,heat})
+
+\end{equation}
+
+
+Leaf area senescence caused by age corresponds to the leaf area of
+the number of leaves senesced ($\Delta N_{d,\,sen}$) from the lowest
+leaf position.
+
+Leaf area senescence caused by soil water ($\text{\ensuremath{\Delta}LAI}_{sen,\,sw}$)
+is calculated as follows.
+
+
+\begin{equation}
+
+\text{\ensuremath{\Delta}LAI}_{sen,\,sw}=k_{sen,\,sw}\times(1-f_{sw,\,photo})\times\text{LAI}
+
+\end{equation}
+
+where $k_{sen,\,sw}$ is the slope of the linear equation relating
+to soil water stress to leaf senescence rate and is specified by `sen_rate_water`
+in wheat.xml (default value 0.10); $f_{sw,\,photo}$ is soil water
+stress for photosynthesis (Equation \@ref(eq:swstressphoto)); LAI is the
+leaf area index.
+
+Leaf area senescence caused by light intensity ($\text{\ensuremath{\Delta}LAI}_{sen,\,light}$)
+is calculated as follows:
+
+
+\begin{equation}
+
+\text{\ensuremath{\Delta}LAI}_{sen,\,light}=k_{sen,\,light}\times(\text{LAI}-\text{LAI}_{c,\,light})\times\text{LAI}\quad\text{LAI}>\text{LAI}_{c,\,light} (\#eq:SensLight)
+
+\end{equation}
+
+where $k_{sen,\,light}$ is sensitivity of leaf area senescence to
+shading and is specified by `sen_light_slope` in wheat.xml
+(default value 0.002); $\text{LAI}_{c,\,light}$ is the critical LAI
+when shading is starting to cause leaf area senescence and is specified
+by `lai_sen_light` in wheat.xml (default value 7).
+
+The leaf area senescence caused by frost is a ratio of LAI.
+
+
+\begin{equation}
+
+\text{\ensuremath{\Delta}LAI}_{sen,\,frost}=k_{sen,\,frost}\text{\ensuremath{\times}LAI} (\#eq:SensFrost)
+
+\end{equation}
+
+where $k_{sen,\,frost}$ is a function of daily minimum temperature
+and is defined by parameters `x_temp_senescence` and `y_senescence_fac`
+in wheat.xml, which are linearly interpolated by APSIM. The default
+value of $k_{sen,\,frost}$ is zero, i.e. there is no frost stress
+in leaf area in the current APSIM-Wheat module.
+
+Senescence by heat calculation has been added in APSIM 7.5. The leaf
+area senescence by heat is a ratio of LAI \citep{asseng2011theimpact}.
+
+
+\begin{equation}
+
+\text{\ensuremath{\Delta}LAI}_{sen,\,heat}=k_{sen,\,heat}\times\text{LAI} (\#eq:SensHeat)
+
+\end{equation}
+
+
+where $k_{sen,\,heat}$ is a function of daily maximum temperature
+which is defined by parameters `x_maxt_senescence` and `y_heatsenescence_fac`
+in wheat.xml which are linearly interpolated by APSIM. 
+
+
+```{r wdHeatSenescence,fig.cap='Fraction of senescence of leaf area index ($k_{sen,\\,heat}$) in response to maximum temperature.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_maxt_senescence", "y_heatsenescence_fac",
+		xlab = expression(paste("Maximum temperature", ~"("*degree*"C)")),
+		ylab = "Senescence fraction of LAI")
+print(p)
+
+```
+
+
+The total leaf area of plant must be more than the minimum plant area
+(`min_tpla`), which has default value 5 mm$^{\text{2}}$ plant$^{\text{-1}}$.
+When some leaves are senesced, only a small amount of nitrogen is
+retained in the senesced leaf, the rest is made available for re-translocation
+included into the `Stem` N pool ( Section @ref(NitrogenPartitioningAndRetranslocation)).
+The concentration of nitrogen in senesced material is specified in
+wheat.xml.
+
+
+## Biomass senescence
+
+
+Leaf biomass senescence $\Delta Q_{sl}$ is the ratio of leaf area
+senescence ($\text{\ensuremath{\Delta}LAI}_{sen}$) with total the
+green LAI at the time considered (LAI). 
+
+\begin{equation}
+
+\Delta Q_{sl}=\Delta Q_{l}\frac{\text{\ensuremath{\text{\ensuremath{\Delta}LAI}_{sen}}}}{\text{LAI}}
+
+\end{equation}
+
+where $\Delta Q_{l}$ is the daily increase of leaf biomass.
+
+
+## Root senescence
+
+
+A rate of 0.5\% of root biomass and root length is senesced each day
+and detaches immediately being sent to the soil nitrogen module and
+distributed as fresh organic matter in the profile.
+
+
+\begin{equation}
+
+\Delta Q_{sen,\,root}=\Delta Q_{root}\times f_{sen,\,root}
+
+\end{equation}
+
+where $\Delta Q_{sen,\,root}$ is the daily `Root` senesced
+biomass, and $f_{sen,\,root}$ is the fraction of senesced root biomass,
+which is defined in `x_dm_sen_frac_root` and `y_dm_sen_frac_root`
+in wheat.xml (Fig. \@ref(fig:wdRootSens))
+
+
+```{r wdRootSens,fig.cap='Fraction of senescence of root biomass.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_dm_sen_frac_root", "y_dm_sen_frac_root",
+		xlab = 'Fraction of material senescence',
+		ylab = "Senescence fraction of Root biomass")
+print(p)
+
+```
+
+
+
+\begin{equation}
+
+\Delta L_{sen,\,root}=\Delta Q_{sen,\,root}\times\text{SRL}
+
+\end{equation}
+
+where $\Delta L_{sen,\,root}$ is the daily root length senescence,
+and SRL is the specific root length. 
+
+Root senescence occurs in each of the soil layers where roots are
+present, as a proportion of the total root length.
+
+\begin{equation}
+
+\Delta L_{sen,\,root}(i)=\Delta L_{sen,\,root}\times\frac{L_{r}(i)}{\sum_{j=1}^{i}L_{r}(j)}
+
+\end{equation}
+
+where $L_{sen,\,root}(i)$ is the root length senescence in soil layer
+$i$, $L_{r}(i)$ is root length in layer $i$, and $\sum_{j=1}^{i}L_{r}(j)$is
+the total root length for all the layers where root are present.
+
+

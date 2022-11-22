@@ -1,0 +1,22 @@
+
+
+# Vapour pressure deficit (VPD) 
+
+
+The vapour pressure deficit (VPD) is calculated as presented in Equation \@ref(eq:VPD).
+VPD affects the transpiration efficiency (Equation \@ref(eq:TranspirationEfficiency))
+and thus the crop water demand (Equation \@ref(eq:soilWaterDemand)). 
+
+\bibliographystyle{elsart-harv}
+\bibliography{wd}
+
+\newpage
+
+\setcounter{figure}{0} 
+\renewcommand{\thefigure}{A.\arabic{figure}}  
+\setcounter{table}{0}  
+\renewcommand{\thetable}{A.\arabic{table}} 
+
+\begin{landscape}
+
+\appendix

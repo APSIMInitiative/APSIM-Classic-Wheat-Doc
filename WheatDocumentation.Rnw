@@ -1,0 +1,2174 @@
+%% LyX 2.3.5.2 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage{courier}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage{babel}
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage{longtable}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[authoryear]{natbib}
+\usepackage{subscript}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=true,pdfborder={0 0 0},pdfborderstyle={},backref=false,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage[font={small,it}]{caption}
+\usepackage{float}
+\usepackage{pdflscape}
+
+\makeatother
+
+\begin{document}
+<<setup, echo=FALSE, warning=FALSE, message=FALSE>>= 
+
+source('Rcode/wdVisXY.R')
+source('Rcode/wdFunctions.R')
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold',     
+	cache=FALSE, echo=FALSE, warning=FALSE, message=FALSE,
+	dev = 'pdf',dpi=300,
+	fig.pos='H',fig.width=4,fig.height=3) 
+options(replace.assign=TRUE,width=90)
+library(lattice)
+trellis_default <- trellis.par.get()
+trellis_default$fontsize$text <- 8
+trellis_default$fontsize$points <- 8
+trellis.par.set(trellis_default)
+library(XML)
+wheat_xml <- xmlInternalTreeParse('wheat.xml')
+@
+\title{The APSIM-Wheat Module (7.5 R3008)}
+
+\maketitle
+This documentation is compiled from the source codes and internal
+documents of APSIM-Wheat module by Bangyou Zheng (bangyou.zheng@csiro.au),
+Karine Chenu (karine.chenu@uq.edu.au), Alastair Doherty (alastair.doherty@daff.qld.gov.au)
+and Scott Chapman (scott.chapman@csiro.au).
+
+\tableofcontents{}
+
+\newpage{}
+
+\section{Scope of the APSIM-Wheat module}
+
+The APSIM-Wheat module simulates the wheat growth and development
+of a wheat crop in a daily time-step on an area basis (per square
+meter, not per single plant). In this module, the wheat crop Wheat
+growth and development responds to weather (radiation, temperature),
+soil water and soil nitrogen, and management practices. The wheat
+module returns information on its soil water and nitrogen uptake to
+the soil water and nitrogen modules on a daily basis for reset of
+these systems. Information on crop cover is also provided to the water
+balance module for calculation of evaporation rates and runoff. Wheat
+stover and root residues are 'passed' from wheat to the surface residue
+and soil nitrogen modules, respectively at the harvest of the wheat
+crop. 
+
+The approaches used in modeling crop processes balance the need for
+a comprehensive description of the observed variation in crop performance
+over diverse production environments and the need to avoid reductionist
+approaches of ever-greater complexity with large numbers of parameters
+that are difficult to measure.
+
+A list of the module outputs is provided in the \textquoteleft Wheat
+module output\textquoteright s section below. Basically the module
+simulates phenological development, leaf area growth expansion, biomass
+and N concentration of different crop components (\texttt{Leaf}, \texttt{Stem},
+\texttt{Root} and \texttt{Grain}) on a daily basis. It also predicts
+grain size and grain number. 
+
+\section{APSIM-Wheat history}
+
+APSIM-Wheat has been developed from a combination of the approaches
+used in previous APSIM wheat modules:\citet{asseng1998useof,asseng1998performance,wang2003thenew,meinke1997improving,meinke1998improving}.
+The current version of the model is implemented within the APSIM Plant
+model framework which is currently used for other crops such as grain
+legumes and canola. Most of the model constants (species-specific)
+and parameters (cultivar specific) are externalized from the code
+(wheat.xml file). 
+
+\section{Phenology}
+
+There are 11 phases in APSIM-Wheat module (\autoref{fig:PhenologWheatModule}).
+The timing of each phase (except from sowing to germination, which
+is driven by sowing depth and thermal time) is determined by the accumulation
+of thermal time ($TT$) adjusted for other factors which vary with
+the phase considered (e.g. vernalisation, photoperiod, N). The length
+of each phase is  determined by a fixed thermal time (\textquoteleft thermal
+time target\textquoteright ), which is specified by \textquotedblleft tt\_\textless phase\_name\textgreater\textquotedblright{}
+in wheat.xml. Most parameters of thermal time targets are cultivar-specific.
+
+\subsection{Thermal time calculation\label{par:Thermal-time}}
+
+The daily thermal time ($\Delta TT$) is calculated from the daily
+average of maximum and minimum crown temperatures, and is adjusted
+by genetic and environmental factors. Hence, the duration of phases
+between emergence and floral initiation is adjusted for photoperiod
+and vernalisation, using the cultivar-specific parameters ``photoperiod
+factor'' ($f_{D}$, \autoref{eq:PhotoperiodFactor}) and ``vernalisation
+factor'' ($f_{V}$, \autoref{eq:VernalisationFactor}). Other environmental
+factors include soil water stress ($f_{W,\,pheno}$, \autoref{eq:SoilWaterStress}),
+ nitrogen stress ($f_{N,\,pheno}$, \autoref{eq:NitrogenStress})
+and phosphorus stress ($f_{P,\,pheno}$, \autoref{sub:Phosphorus-stress})
+in all phases except from Sowing to Emergence (See details below),
+but they are all parametrized to have to effect in the current released
+APSIM-Wheat. All factors are bound from 0 to 1. 
+
+\begin{figure}[h]
+\begin{centering}
+\includegraphics[width=17cm]{figure/wdWheatPhenology}
+\par\end{centering}
+\caption{\label{fig:PhenologWheatModule}Phenology in the APSIM\_Wheat module.
+Targets are expressed in adjusted thermal time (\autoref{eq:CumThermalTime2})
+and are cultivar-specific parameters. The values given for the reference
+genotype Hartog. }
+\end{figure}
+
+Crown temperatures are simulated according to the original routines
+in CERES-Wheat and correspond to air temperatures for non-freezing
+temperatures.\textbf{ }The maximum and minimum crown temperatures
+($T_{cmax}$ and $T_{cmin}$) are calculated according to the maximum
+and minimum air temperature ($T_{max}$ and $T_{min}$), respectively.
+\begin{equation}
+T_{cmax}=\begin{cases}
+2+T_{max}(0.4+0.0018(H_{snow}-15)^{2}) & \quad T_{max}<0\\
+T_{max} & \quad T_{max}\geq0
+\end{cases}\label{eq:CrownMaxTemperature}
+\end{equation}
+\begin{equation}
+T_{cmin}=\begin{cases}
+2+T_{min}(0.4+0.0018(H_{snow}-15)^{2}) & \quad T_{min}<0\\
+T_{min} & \quad T_{min}\geq0
+\end{cases}\label{eq:CrownMinTemperature}
+\end{equation}
+where $H_{snow}$ is the snow depth (cm). The default value of $H_{snow}$
+is set to zero in the source codes (\autoref{fig:wdCrownTemperature}).
+For more detail information about \autoref{eq:CrownMaxTemperature}
+and \autoref{eq:CrownMinTemperature}, please see the function\textbf{
+}\texttt{CWVernalPhase::vernalisation} in the APSIM code.
+
+<<wdCrownTemperature,fig.cap='Crown temperature ($T_{c}$) in response to air temperature ($T$) for different snow depth ($H_{snow}$) in APSIM-Wheat. In the released APSIM version, $H_{snow}$ equals zero cm.'>>=  
+p <- wdCrownTemperature()
+print(p)  
+@
+
+The daily crown mean temperature ($T_{c}$) is calculated by the maximum
+($T_{cmax}$) and minimum ($T_{cmin}$) crown temperature.
+
+\begin{equation}
+T_{c}=\frac{T_{cmax}+T_{cmin}}{2}
+\end{equation}
+
+Daily thermal time ($\Delta TT$) is calculated based on daily mean
+crown temperature, using three cardinal temperatures (\autoref{fig:wdThermalTime}).
+The default values of the cardinal temperatures and relative thermal
+time are specified by x\_temp (0, 26, 34) and y\_tt (0, 26, 0), respectively,
+in the wheat.xml (\autoref{fig:wdThermalTime}). Other crop modules
+in APSIM calculate thermal time every 3 hours.
+
+\begin{equation}
+\Delta TT=\begin{cases}
+T_{c} & \quad0<T_{c}\leq26\\
+\frac{26}{8}(34-T_{c}) & \quad26<T_{c}\leq34\\
+0 & \quad T_{c}\leq0\;\text{or}\;T_{c}>34
+\end{cases}\label{eq:thermaltime}
+\end{equation}
+
+<<wdThermalTime,fig.cap='Daily thermal time ($\\Delta TT$) in response to daily crown temperature ($T_{c}$) in APSIM-Wheat.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_temp", "y_tt",
+		xlab = expression(paste("Crown Temperature", ~"("*degree*"C)")),
+		ylab = expression(paste("Thermal Time", ~"("*degree*"Cd)"))) 
+print(p)
+@
+
+For each phenological stage, the daily thermal time ($TT^{\prime}$)
+is summed from the start of phase and can be reduced by photoperiod
+($f_{D}$, \autoref{eq:PhotoperiodFactor}) and vernalisation factor
+($f_{V}$, \autoref{eq:VernalisationFactor}) and also dependent on
+environmental factors (photoperiod and temperature). The environmental
+factors include soil water stress ($f_{W,\,pheno}$, \autoref{eq:SoilWaterStress}),
+nitrogen stress ($f_{N,\,pheno}$, \autoref{eq:NitrogenStress}) and
+phosphorus stress ($f_{P,\,pheno}$, \autoref{sub:Phosphorus-stress}).
+The next phenological stage occurs when this adjusted thermal time
+($TT^{\prime}$ in \autoref{eq:CumThermalTime}) reaches the ``target
+thermal time'' for the stage considered \autoref{fig:PhenologWheatModule}.
+\begin{equation}
+TT^{\prime}=\sum[\Delta TT\times\min(f_{D},\;f_{V})\times\min(f_{W,\,pheno},\:f_{N,\,pheno},\;f_{P,\,pheno})]\label{eq:CumThermalTime}
+\end{equation}
+In the current released version, soil water, nitrogen and phosphorus
+stresses have no effect on phenological development (i.e. parameters
+$f_{W,\,pheno}=f_{P,\,pheno}=1$ \autoref{eq:SoilWaterStress}, and
+$f_{N,\,pheno}$ has values typically above 1 \autoref{eq:NitrogenStress}).
+So, \autoref{eq:CumThermalTime} is reduced to 
+
+\begin{equation}
+TT^{\prime}=\sum[\Delta TT\times\min(f_{D},\;f_{V})]\label{eq:CumThermalTime2}
+\end{equation}
+
+In the output variables of wheat module, $TT^{\prime}$ from the start
+of each phase is named as ``ttafter\textless phasename\textgreater ''.
+For example, the output variable ``ttaftersowing'' is not the actual
+thermal time after sowing, but the thermal time adjusted for genetic
+and environmental factors.
+
+\subsection{Sowing-germination phase}
+
+The seed germination is determined by soil water availability in the
+seeded layer (specified by \texttt{pesw\_germ} with default value
+0 mm). The crop will die if germination has not occurred before a
+certain period, defined by \texttt{days\_germ\_limit} in wheat.xml,
+which has a default value of 40 d.
+
+\subsection{Germination-emergence phase}
+
+The germination to emergence phase includes an effect of the depth
+of sowing ($D_{seed}$) on the thermal time target. The phase is comprised
+of an initial period of fixed thermal time during which shoot elongation
+is slow (the \textquotedblleft lag\textquotedblright{} phase, $T_{lag}$)
+and a linear period, where the rate of shoot elongation ($r_{e}$,
+C d mm$^{-1}$) towards the soil surface is linearly related to air
+temperature. Then, the period of emergence ($T_{emer}$) is calculated
+by 
+\begin{equation}
+T_{emer}=T_{lag}+r_{e}D_{seed}\label{eq:Emergence}
+\end{equation}
+
+The crop will die if emergence has not occurred before a certain period,
+defined by \texttt{tt\_emerg\_limit} in wheat.xml, which has a default
+value of 300$^{\circ}\text{C}$ d.
+
+Most studies on seedling germination have simply recorded the accumulated
+thermal time between germination and 50\% emergence from a given sowing
+depth. For the purposes of model parametrization the value of $T_{lag}$
+(\texttt{shoot\_lag}) has been assumed to be around 40 $^{\circ}\text{C}$
+d, while $r_{e}$ (\texttt{shoot\_rate}) has been derived from studies
+where thermal time to emergence was measured and where sowing depth
+was known and it is set to 1.5 $^{\circ}\text{C}$ d per mm. This
+means that at a sowing depth of 40 mm emergence occurs 100$^{\circ}\text{C}$
+d after germination ($40+1.5\times40$).
+
+There is the capability of increasing the time taken to reach emergence
+due to a dry soil layer in which the seed is germinating, through
+the relationship between \texttt{fasw\_emerg} and \texttt{rel\_emerg\_rate}.
+Currently this effect is \textquotedblleft turned off\textquotedblright{}
+in the Wheat.xml file.
+
+\subsection{Photoperiod impact on phenology\label{subsec:Photoperiod}}
+
+Photoperiod is calculated from day of year and latitude using standard
+astronomical equations accounting for civil twilight using the parameter
+twilight, which is assumed to be -6$^{\circ}$ (civil twilight) in
+wheat.xml. Twilight is defined as the interval between sunrise or
+sunset and the time when the true center of the sun is 6$^{\circ}$
+below the horizon. Other crop modules of APSIM have used -2.2$^{\circ}$
+as twilight parameters. In APSIM, the photoperiod affects phenology
+between emergence and floral initiation (\autoref{fig:PhenologWheatModule}).
+During this period, thermal time is affected by a photoperiod factor
+($f_{D}$ in \autoref{eq:CumThermalTime} and \autoref{eq:CumThermalTime2})
+that is calculated by
+\begin{equation}
+f_{D}=1-0.002R_{p}(20-L_{P})^{2}\label{eq:PhotoperiodFactor}
+\end{equation}
+where $L_{P}$ is the day length (h), $R_{P}$ is the sensitivities
+to photoperiod which is cultivar-specific and is specified by \texttt{photop\_sens}
+in wheat.xml. The default value of $R_{P}$ is 3 (\autoref{fig:wdPhotoperiod}).
+
+<<wdPhotoperiod,fig.cap='Relationship between photoperiod factor ($f_{D}$) and day length ($L_{P}$) with different sensitivities to photoperiod ($R_{p}$). The default value of $R_{P}$ is 3.'>>=  
+p <- wdPhotoPeriod()
+print(p)  
+@
+
+\subsection{Vernalisation impact on phenology}
+
+In APSIM, vernalisation effects phenology between emergence and floral
+initiation (\autoref{fig:PhenologWheatModule}). During this period,
+thermal time is affected by a vernalisation factor ($f_{V}$ in \autoref{eq:CumThermalTime}
+and \autoref{eq:CumThermalTime2}).
+
+Vernalisation is simulated from daily average crown temperature ($T_{c}$),
+daily maximum ($T_{max}$) and minimum ($T_{min}$) temperatures using
+the original CERES approach (\autoref{fig:wdVernalisation}).
+\begin{equation}
+\Delta V=\min(1.4-0.0778T_{c},\:0.5+13.44\frac{T_{c}}{(T_{max}-T_{min}+3)^{2}})\quad\text{when, }T_{max}<30\,{}^{\circ}\text{C}\:\text{and}\,T_{min}<15\,{}^{\circ}\text{C}
+\end{equation}
+
+<<wdVernalisation,fig.cap='Relationship between vernalisation ($\\Delta V$) and maximum ($T_{max}$) and minimum ($T_{min}$) temperature.'>>= 
+p <- wdVernalisation()
+print(p)  
+@
+
+Devernalisation can occur if daily $T_{max}$ is above 30 $^{\circ}\text{C}$
+and the total vernalisation ($V$) is less than 10 (\autoref{fig:wdDevernalisation}).
+\begin{equation}
+\Delta V_{d}=\min(0.5(T_{max}-30),\:V)\quad\text{when, }T_{max}>30\,{}^{\circ}\text{C}\;\text{and}\;V<10
+\end{equation}
+
+<<wdDevernalisation,fig.cap='Relationship between devernalisation ($\\Delta V_{d}$) and maximum temperature ($T_{max}$) when the total vernalisation ($V$) is less than 10.'>>= 
+p <- wdDevernalisation()
+print(p)  
+@
+
+The total vernalisation ($V$) is calculated by summing daily vernalisation
+and devernalisation from Germination to Floral initiation (Composite
+phase \texttt{Vernalisation} in \autoref{fig:PhenologWheatModule}).
+\begin{equation}
+V=\sum(\Delta V-\Delta V_{d})
+\end{equation}
+However, the vernalisation factor ($f_{v}$) is calculated just from
+Emergence to Floral initiation (Composite phases \textbf{eme2ej} in
+Fig. \ref{fig:PhenologWheatModule}).
+\begin{equation}
+f_{V}=1-(0.0054545R_{V}+0.0003)\times(50-V)\label{eq:VernalisationFactor}
+\end{equation}
+where $R_{V}$ is the sensitivities to vernalisation, which is cultivar-specific
+and is specified by \texttt{vern\_sens} in wheat.xml. The default
+value of $R_{V}$ is 1.5 (\autoref{fig:wdVernalisationFactor}) 
+
+<<wdVernalisationFactor,fig.width=4,fig.height=4,fig.cap='Relationship between cumulated vernalisation ($V$) and vernalisation factor ($f_{V}$) and for different sensitivities to vernalisation ($R_{V}$). The default value of $R_{V}$ is 1.5.'>>= 
+p <- wdVernalisationFactor()
+print(p)  
+@
+
+\section{Biomass accumulation (Photosynthesis)}
+
+The daily biomass accumulation ($\Delta Q$) corresponds to dry-matter
+above-ground biomass, and is calculated as a potential biomass accumulation
+resulting from radiation interception ($\Delta Q_{r}$, \autoref{eq:BiomassProduction})
+that is limited by soil water deficiency ($\Delta Q_{w}$, \autoref{eq:WaterStressBiomassProduction-1}).
+
+\subsection{Potential biomass accumulation from radiation use efficiency\label{subsec:Radiation-limited-biomass}}
+
+The radiation-limited dry-biomass accumulation ($\Delta Q_{r}$) is
+calculated by the intercepted radiation ($I$), radiation use efficiency
+($RUE$), diffuse factor ($f_{d}$, \autoref{par:Diffuse-factor}),
+stress factor ($f_{s}$, \autoref{eq:StressFactor4Photosynthesis})
+and carbon dioxide factor ($f_{c}$, \autoref{eq:CO2Factor4Photosynthesis}).
+
+\begin{equation}
+\Delta Q_{r}=I\times RUE\times f_{d}\times f_{s}\times f_{c}\label{eq:BiomassProduction}
+\end{equation}
+where $f_{d}$, $f_{s}$ and $f_{c}$ are defined in the wheat.xml
+file. In the current version of APSIM-Wheat, only \texttt{Leaf} produces
+photosynthate. Diffuse factor ($f_{d}$) equals to 1 (\autoref{par:Diffuse-factor}),
+so that \autoref{eq:BiomassProduction} can be: 
+\begin{equation}
+\Delta Q_{r}=I\times RUE\times f_{s}\times f_{c}\label{eq:BiomassProduction2}
+\end{equation}
+
+
+\subsubsection{Radiation interception}
+
+Radiation interception is calculated from the leaf area index (LAI,
+m$^{2}$ m$^{-2}$) and the extinction coefficient (\textit{k}) \citep{monsi2005onthe}.
+\begin{equation}
+I=I_{0}(1-\exp(-k\times LAI\times f_{h})/f_{h})\label{eq:RadiationInterception}
+\end{equation}
+where $I_{0}$ is the total radiation at the top of the canopy (MJ)
+which is directly imported from weather records; $f_{h}$ is light
+interception modified to give hedge-row effect with skip row. $f_{h}$
+could be calculated based on the canopy width, but is not used in
+the current version of APSIM (i.e. $f_{h}$ = 1). So, \autoref{eq:RadiationInterception}
+is reduced to.
+\begin{equation}
+I=I_{0}(1-\exp(-k\times LAI))\label{eq:RadiationInterception-1}
+\end{equation}
+
+Extinction coefficient ($k$) varies with row spacing, 
+\begin{equation}
+k=h_{e}(W_{r})
+\end{equation}
+where $W_{r}$ is the row spacing which is specified by the user (in
+the APSIM interface, the .sim or .apsim file); $h_{e}$ is a function
+of rowing spacing which is defined for both green leaf and dead leaves
+by parameters \texttt{x\_row\_spacing}, \texttt{y\_extinct\_coef}
+in the wheat.xml file (\autoref{fig:wdRowExtinct}) and is linearly
+interpolated by APSIM. In the current version of APSIM-Wheat, no impact
+of row spacing is considered (\autoref{fig:wdRowExtinct})
+
+<<wdRowExtinct,fig.cap='Values of extinction coefficient for different row spacings.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_row_spacing", 
+		c("y_extinct_coef",
+			'y_extinct_coef_dead'),
+		xlab = 'Row spacing (mm)',
+		ylab = 'Extinction coefficient (k)',
+		keylab = c('Green leaf', 'Dead leaf'),
+		keypos = c(0.9, 0.5))  
+print(p)
+@
+
+\subsubsection{Radiation use efficiency}
+
+$RUE$ (g MJ$^{\text{-1}}$) is a function of growth stages which
+is defined by parameters \texttt{x\_stage\_rue} and \texttt{y\_rue}
+in wheat.xml (\autoref{fig:wdRUE}) and linearly interpolated by APSIM.
+In the current version of APSIM-Wheat, $RUE$ equal to 1.24 from emergence
+to the end of grain-filling and does not vary as a function of daily
+incident radiation as in the model NWHEAT.
+
+<<wdRUE,fig.cap='Radiation use efficiency (RUE) for different growth stages.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_stage_rue", "y_rue",
+		xlab = 'Stage code',
+		ylab = 'RUE') 
+print(p)
+@
+
+\subsubsection{Stress factor (Temperature, nitrogen, phosphorus (not applied), oxygen
+(not applied))}
+
+Actual daily radiation-limited biomass accumulation can be reduced
+by a stress factor ($f_{s}$, \autoref{eq:BiomassProduction} and
+\autoref{eq:BiomassProduction2}). This stress factor is the minimum
+value of a temperature factor ($f_{T,\ photo}$, \autoref{eq:TemStressPhoto}),
+a nitrogen factor ($f_{N\ photo}$, \autoref{eq:NStressPhoto}), a
+phosphorus factor ($f_{P\ photo}$) and an oxygen factor ($f_{O\ photo}$).
+\begin{equation}
+f_{s}=\min(f_{T,\ photo},\ f_{N,\ photo},\ f_{P,\ photo},\ f_{O,\ photo})\label{eq:StressFactor4Photosynthesis}
+\end{equation}
+No phosphorus stress $f_{P,\,photo}$ and oxygen stress $f_{O,\,photo}$
+are applied in the current version of APSIM-Wheat. So, \autoref{eq:StressFactor4Photosynthesis}
+is reduced to 
+\begin{equation}
+f_{s}=\min(f_{T,\ photo},\ f_{N,\ photo})\label{eq:StressFactor4Photosynthesis2}
+\end{equation}
+
+
+\paragraph{The temperature factor}
+
+$f_{T,\ photo}$ is a function of the daily mean temperature and is
+defined by parameters \texttt{x\_ave\_temp} and \texttt{y\_stress\_photo}
+in the wheat.xml (\autoref{fig:wdTemperatureFactorOnPhoto}). Values
+are linearly interpolated by APSIM. The temperature stress is applied
+from sowing to harvest. 
+
+\begin{equation}
+f_{T,\ photo}=h_{T,\ photo}(\frac{T_{max}+T_{min}}{2})\label{eq:TemStressPhoto}
+\end{equation}
+
+<<wdTemperatureFactorOnPhoto,fig.cap='Temperature factor in response to mean daily temperature.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_ave_temp", "y_stress_photo",
+		xlab = expression(paste("Mean daily temperature", ~"("*degree*"C)")),
+		ylab = expression(Temperature~factor~(f[T])))
+print(p)
+@
+
+\paragraph{The nitrogen factor}
+
+$f_{N,\,photo}$ is determined by the difference between leaf nitrogen
+concentration and leaf minimum and critical nitrogen concentration.
+
+\begin{equation}
+f_{N,\,photo}=R_{N,\,photo}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}-C_{N,\,min}}\label{eq:NStressPhoto0}
+\end{equation}
+where $C_{N}$ is the nitrogen concentration of \texttt{Leaf} parts;
+$R_{N,\,expan}$ is multiplier for nitrogen deficit effect on phenology
+which is specified by \texttt{N\_fact\_photo} in the wheat.xml and
+default value is 1.5.
+
+\paragraph{The CO$_{\text{2}}$ factor}
+
+For C3 plants (like wheat), the CO$_{\text{2}}$ factor of APSIM is
+calculated by a function of environmental CO$_{\text{2}}$ concentration
+($C$, ppm) and daily mean temperature ($T_{mean}$) as published
+by \citet{reyenga1999modelling}
+
+\begin{equation}
+f_{c}=\frac{(C-C_{i})(350+2C_{i})}{(C+2C_{i})(350-C_{i})}\label{eq:CO2Factor4Photosynthesis}
+\end{equation}
+where $C_{i}$ is the temperature dependent CO$_{\text{2}}$ compensation
+point (ppm) and is derived from the following function. 
+\begin{equation}
+C_{i}=\frac{163-T_{mean}}{5-0.1T_{mean}}
+\end{equation}
+
+<<wdCardonDioxideFactor,fig.cap='CO$_{2}$ factor in response to the CO$_{2}$ level ($C$) for different mean air temperatures.'>>=  
+p <- wdCarbonDioxideFactor()
+print(p)
+@
+
+\paragraph{Diffuse factor (not used in the current version)\label{par:Diffuse-factor}}
+
+The daily diffuse fraction was calculated using the functions suggested
+by \citet{roderick1999estimating}:
+
+\begin{equation}
+\begin{cases}
+\frac{R_{d}}{R_{s}}=Y_{0} & \qquad for\:\frac{R_{s}}{R_{o}}\leq X_{0}\\
+\frac{R_{d}}{R_{s}}=A_{0}+A_{1}\frac{R_{s}}{R_{o}} & \qquad for\:X_{0}<\frac{R_{s}}{R_{o}}\leq X_{1}\\
+\frac{R_{d}}{R_{s}}=Y_{1} & \qquad for\:\frac{R_{s}}{R_{o}}>X_{1}
+\end{cases}\label{eq:DiffuseFraction}
+\end{equation}
+where
+\begin{equation}
+\begin{array}{c}
+A_{0}=Y_{1}-A_{1}X_{1}\\
+A_{1}=\frac{Y_{1}-Y_{0}}{X_{1}-X_{0}}
+\end{array}
+\end{equation}
+where $R_{o}$ is the daily extra-terrestrial solar irradiance (i.e.
+top of the atmosphere); $R_{d}$ and $R_{s}$ are the daily diffuse
+and global solar irradiance at the surface, respectively. $X_{0}$,
+$X_{1}$, $Y_{0}$ and $Y_{1}$ are four empirical parameters.
+\begin{equation}
+\begin{array}{l}
+X_{0}=0.26,\qquad Y_{0}=0.96,\qquad Y_{1}=0.05,\;and\\
+X_{1}=0.80-0.0017|\varphi|+0.000044|\varphi|^{2}
+\end{array}
+\end{equation}
+where $\varphi$ is latitude. 
+
+$R_{o}$ is derived from this function
+\begin{equation}
+R_{0}=\frac{86400\times1360\times(\varpi\times\sin(\varphi)\times\sin(\theta)+\cos(\varphi)\times\cos(\theta)\times\sin(\varpi_{0}))}{1000000\pi}
+\end{equation}
+where $\varpi_{0}$ is the time of sunrise and sunset, which derives
+from any solar declination ($\theta$) and latitude ($\varphi$) in
+terms of local solar time when sunrise and sunset actually occur (\url{http://en.wikipedia.org/wiki/Sunrise_equation})
+\begin{equation}
+\varpi_{0}=\arccos(-\tan(\varphi)\tan(\theta))
+\end{equation}
+Solar declination ($\theta$) can be calculated by 
+\begin{equation}
+\theta=23.45\sin(\frac{2\pi}{365.25}(N-82.25))
+\end{equation}
+where $N$ is day of year. 
+
+$f_{d}$ is calculated by a function of the diffuse fraction which
+is not implemented in current wheat module, (i.e. $f_{d}$ = 1).
+
+\subsection{Actual daily biomass accumulation}
+
+The actual daily biomass accumulation ($\Delta Q$) results from water
+limitation applied on the potential radiation-driven biomass accumulation
+($\Delta Q_{r}$). This water-limited biomass ($\Delta Q_{w}$) is
+a function of the ratio between the daily water uptake ($W_{u}$,
+\autoref{eq:WaterUpdate}) and demand ($W_{d}$, \autoref{eq:soilWaterDemand-1})
+capped by 
+\begin{equation}
+\Delta Q_{w}=\Delta Q_{r}f_{w,\,photo}=\Delta Q_{r}\frac{W_{u}}{W_{d}}\label{eq:WaterStressBiomassProduction-1}
+\end{equation}
+where $f_{w,\,photo}$ is the water stress factor affecting photosynthesis
+(\autoref{eq:swstressphoto}); $W_{u}$ is the actual daily water
+uptake from the root system (which corresponds to the soil water supply
+($W_{s}$) capped by $W_{d}$), $W_{d}$ is the soil water demand
+of Leaf and Head parts (\autoref{sec:Crop-Water-Relations}). 
+
+When the soil water is non-limiting ($f_{w,\,photo}$ = 1, i.e. $W_{d}\geq W_{s}$),
+biomass accumulation is limited by the radiation ($\Delta Q=\Delta Q_{r}$,
+\autoref{eq:actualBiomassProduction}). When the soil water is limiting,
+biomass accumulation is limited by water supply ($\Delta Q=\Delta Q_{w}$).
+
+The water demand ($W_{d}$, in mm) corresponds to the amount of water
+the crop would have transpired in the absence of soil water constraint,
+and is calculated from the potential biomass accumulation from RUE
+($\Delta Q_{r}$, \autoref{eq:BiomassProduction}). Following \citet{sinclair1986waterand},
+transpiration demand is modeled as a function of the current day's
+crop growth rate, estimated by the potential biomass accumulation
+associated with intercepted radiation ($\Delta Q_{r}$, see \autoref{eq:BiomassProduction}),
+divided by the transpiration efficiency. 
+
+\begin{equation}
+W_{d}=\frac{\Delta Q_{r}-R}{TE}\label{eq:soilWaterDemand-1}
+\end{equation}
+where $R$ is respiration rate and equals to zero in the current version
+of APSIM-Wheat, $TE$ is transpiration efficiency (\autoref{eq:TranspirationEfficiency}).
+See \autoref{sec:Crop-Water-Relations} for more details about water
+demand and supply. \medskip{}
+
+The daily biomass accumulation ($\Delta Q$) corresponds to dry matter
+above ground biomass is limited by the radiation interception ($\Delta Q_{r}$,
+\autoref{eq:BiomassProduction}) or by soil water deficiency ($\Delta Q_{w}$,
+\autoref{eq:WaterStressBiomassProduction}), so that daily biomass
+accumulation can be expressed as: 
+\begin{equation}
+\Delta Q=\begin{cases}
+\Delta Q_{r}\qquad & W_{u}=W_{d}\\
+\Delta Q_{w}\qquad & W_{u}<W_{d}
+\end{cases}\label{eq:actualBiomassProduction}
+\end{equation}
+where $W_{s}$ is water supply, $W_{d}$ is the soil water demand
+from the shoot, limited by radiation interception (\autoref{sub:Crop-water-demand}).
+In the current APSIM-Wheat, $W_{d}$ is actually only directly affected
+by the soil water demand of the leaf (\autoref{sub:Crop-water-demand}).
+$W_{u}$ and $W_{d}$ are calculated by soil module of APSIM.
+
+\section{Biomass partitioning and re-translocation}
+
+\subsection{Biomass partitioning}
+
+In the wheat module, wheat is divided into four components or parts:
+\texttt{Root}, \texttt{Heat}, \texttt{Leaf} and \texttt{Stem} (\autoref{fig:WheatClassStructure}),
+and is derived from a more generic plant module (meaning that it has
+some parts not used or has a terminology, better adapted to other
+crops). \texttt{Leaf} includes only leaf blades. \texttt{Stem} is
+defined in a functional rather than a morphological manner and includes
+plant stems, leaf sheaths and stem-like petioles (not applicable for
+wheat). \texttt{Head} is divided into \texttt{Grain} and \texttt{Pod}
+(which correspond to spike without the grain). Then grain are separated
+into \texttt{Meal} and \texttt{Oil} (not used). The structure of wheat
+parts is shown in \autoref{fig:WheatClassStructure}. 
+
+\begin{figure}[h]
+\begin{centering}
+\includegraphics[height=6cm]{figure/wdBiomassPartition}
+\par\end{centering}
+\caption{\label{fig:WheatClassStructure}The hierarchical structure of wheat
+parts. Texts in the parentheses are classes of parts. The gray box
+indicates a plant part not used in wheat.}
+\end{figure}
+
+On the day of emergence, biomass in plant parts (\texttt{Root}, \texttt{Head},
+\texttt{Leaf}, \texttt{Stem}, \texttt{Pod}, \texttt{Meal} and \texttt{Oil})
+are initialized by \texttt{root\_dm\_init} (set at 0.01 g plant\textsuperscript{-1}
+in the wheat.xml file), \texttt{leaf\_dm\_init} (0.003 g plant\textsuperscript{-1}),
+\texttt{stem\_dm\_init} (0.0016 g plant\textsuperscript{-1}), \texttt{pod\_dm\_init}
+(0 g plant\textsuperscript{-1}), \texttt{meal\_dm\_init} (0 g plant\textsuperscript{-1}),
+\texttt{oil\_dm\_init} (0 g plant\textsuperscript{-1}), respectively.
+Daily biomass production (\autoref{eq:actualBiomassProduction}) is
+then partitioned to different plant parts in different ratios that
+vary with crop stage. Overall, Root biomass are calculated with a
+shoot:root ratio from the above-ground biomass ($\Delta Q$; \autoref{fig:BiomassPartition}).
+Then the above-ground biomass are partitioned into the different plant
+parts hierarchically, with biomass being attributed first to \texttt{Head},
+then \texttt{Leaf} and finally \texttt{Stem}. This means that all
+parts might not have the biomass demand satisfied if the biomass production
+is limited. 
+
+\begin{figure}[h]
+\begin{centering}
+\includegraphics[height=4.5cm]{figure/wdBiomassPartitioning}
+\par\end{centering}
+\caption{\label{fig:BiomassPartition}Biomass partition rules in the APSIM-Wheat
+module. Texts in the parentheses are partitioning methods of different
+organ types. The above-ground biomass ($\Delta Q$) is used to calculate
+\texttt{Root} biomass based on a shoot:root ratio, and is then partition
+to (1) \texttt{Head} based on the demand from \texttt{Pod} and \texttt{Grain},
+and then (2) \texttt{Leaf }(proportion of the remaining biomass),
+and (3) \texttt{Stem}. Re-translocation occurs during grain filling,
+when the biomass accumulation doesn't satisfy \texttt{Head} demand.
+Biomass from \texttt{Stem} and \texttt{Pod} are then used to satisfy
+the \texttt{Head} demand (\texttt{Pod} and \texttt{Grain}).}
+\end{figure}
+
+
+\subsection{Biomass partitioning to \texttt{Root}}
+
+Firstly, some biomass are allocated to the root as a ratio of daily
+available biomass ($\Delta Q$, \autoref{eq:BiomassProduction}).
+The so-called 'magic' fraction of biomass going to \texttt{Root} is
+calculated from a stage-dependent function, but is independent on
+pedo-climatic factors (\autoref{fig:wdroothootRatio}). All biomass
+in the \texttt{Root} is considered as structural fraction, meaning
+that it cannot be re-translocated to other parts later on.
+
+\begin{equation}
+\Delta Q_{root}=\Delta Q\times R_{Root:Shoot}\label{eq:RootBiomass}
+\end{equation}
+where $\Delta Q_{root}$ is the daily increment in \texttt{Root} biomass;
+and $R_{Root:Shoot}$ is the ratio root:shoot biomass, which is defined
+by x\_sta\texttt{x\_stage\_no\_partition} and \texttt{y\_ratio\_root\_shoot}
+in wheat.xml (\autoref{fig:wdroothootRatio}). 
+
+\texttt{(}which is specified in wheat.xml ) 
+
+<<wdroothootRatio,fig.cap='Relationship between ratio of root and shoot and growth stage.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_stage_no_partition", "y_ratio_root_shoot",
+		xlab = "Stage",
+		ylab = "Ratio of root and shoot")
+print(p)
+@
+
+\subsection{Biomass partitioning to \texttt{Head} (\texttt{Pod}, \texttt{Meal}
+and \texttt{Oil }(not applicable in this version))}
+
+Then all or part of available biomass ($\Delta Q$) are partitioned
+into \texttt{Heads} according to total demand of \texttt{Heads} (\texttt{Meal},
+\texttt{Oil} and \texttt{Pod}). \texttt{Meal} and \texttt{Pod} demands
+are calculated by \autoref{eq:MealDemand} and \autoref{eq:GrainDemand}.
+\texttt{Oil} demand always equals to zero in the current version of
+the APSIM-Wheat module. Biomass directly partitioned in \texttt{Pod}
+or \texttt{Grain} is considered as structural and cannot be re-translocated,
+however the biomass providing from re-translocation is accumulated
+as non-structural biomass. The \texttt{Pod} non-structural biomass
+can then be re-translocated into \texttt{Grain} (See \autoref{sub:Re-translocation}).
+
+\begin{equation}
+\begin{array}{c}
+\Delta Q_{head}=\min(\Delta Q,\,D_{grain}+D_{pod})\\
+\Delta Q_{grain}=\frac{D_{g}}{D_{head}}\Delta A_{head}\\
+\Delta Q_{pod}=\frac{D_{p}}{D_{head}}\Delta A_{head}
+\end{array}\label{eq:HeadBiomass}
+\end{equation}
+where $\Delta Q_{head}$ is the daily available biomass for \texttt{Head},
+$D_{head}$, $D_{grain}$and $D_{pod}$ are demands for \texttt{Head},
+\texttt{Grain} and \texttt{Pod}, respectively (see \autoref{sub:Grain-(meal)-demand}
+and \autoref{sub:Pod-demand}). $\Delta Q_{grain}$ and $\Delta Q_{pod}$
+are biomass increment of \texttt{Grain} and \texttt{Pod}, respectively. 
+
+\subsection{Biomass partitioning to \texttt{Leaf}}
+
+Then, the remaining biomass (after the partitioning to the \texttt{Heads})
+are partitioned into \texttt{Leaf} based on a stage dependent function
+(\autoref{fig:wdFractionLeaf}). \texttt{Leaf} biomass is considered
+as structural and thus cannot be re-mobilised.
+
+\begin{equation}
+\Delta Q_{leaf}=(\Delta Q-\Delta Q_{head})\times F_{leaf}
+\end{equation}
+where $\Delta Q_{leaf}$ is the daily increment in \texttt{Leaf} biomass;
+and $F_{leaf}$ is the fraction of available biomass partitioned to
+the leaf, which is defined by \texttt{x\_stage\_no\_partition} and
+\texttt{y\_frac\_leaf} in wheat.xml (\autoref{fig:wdFractionLeaf}). 
+
+<<wdFractionLeaf,fig.cap='Relationship between fraction of leafLeaf  and growth stage.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_stage_no_partition", "y_frac_leaf",
+		xlab = "Stage",
+		ylab = "Fraction of leaf")
+print(p)
+@
+
+\subsection{Biomass partitioning to \texttt{Stem}}
+
+Finally, the whole remaining biomass (if any) are partitioned into
+\texttt{Stem} (\autoref{fig:BiomassPartition}). Until the stage ``start
+of grain filling'', 65\% of this biomass is distributed to structural
+biomass (\autoref{fig:wdStemGrowthStructuralFractionStage}), while
+remaining 35\% is allocated in un-structural biomass. Afterwards,
+all new biomass allocated to \texttt{Stem} is for non-structural biomass
+(which can re-mobilised).
+
+\begin{equation}
+\Delta Q_{stem}=\Delta Q-\Delta Q_{head}-\Delta Q_{leaf}
+\end{equation}
+\begin{equation}
+\Delta Q_{stem.\,structural}=\Delta Q_{stem}\times h_{structual}
+\end{equation}
+
+\begin{equation}
+\Delta Q_{stem.\,non-structural}=\Delta Q_{stem}\times(1-h_{structual})\label{eq:StemNonStructural}
+\end{equation}
+where $\Delta Q_{stem}$ is the daily increment in \texttt{Stem} biomass;
+$\Delta Q_{stem.\,structural}$ is the structural biomass of \texttt{Stem};
+$\Delta Q_{stem.\,non-structural}$ is the non-structural biomass
+of \texttt{Stem}; and $h_{structual}$ is the fraction of \texttt{Stem}
+biomass distributed to structural biomass which depends on the growth
+stage (S). $h_{structual}$ is specified by \texttt{stemGrowthStructuralFraction}
+and \texttt{stemGrowthStructuralFractionStage} in wheat.xml, with
+a default value of 0.65 before beginning of grain filling and 0 after. 
+
+<<wdStemGrowthStructuralFractionStage,fig.cap='Relationship between fraction of structural and unstructural biomass in Stem.'>>=  
+p <- wdStemGrowthStructuralFraction()
+print(p)
+@
+
+\subsection{Re-translocation\label{subsec:Re-translocation}}
+
+If the supply in assimilate (daily biomass increase) is insufficient
+to meet \texttt{Grain} demand, then re-translocation may occur to
+meet the shortfall (\autoref{fig:BiomassPartition}). The biomass
+re-translocation first occurs from the \texttt{Stem} non-structural
+biomass. From the start of grain filling, the wheat module allows
+a total re-translocation of up to 20\% of \texttt{Stem} biomass per
+day. If required, biomass can then be re-translocated from the \texttt{Pod}
+non-structural biomass. The re-translocated biomass is used to fulfill
+the \texttt{Grain} and \texttt{Pod} demands (\autoref{sub:Grain-(meal)-demand}
+and \autoref{sub:Pod-demand}) and is accumulated as non-structural
+biomass. 
+
+\begin{equation}
+D_{diff,\,head}=(D_{grain}-\text{\ensuremath{\Delta}}Q_{grain})+(D_{pod}-\Delta Q_{pod})
+\end{equation}
+where $D_{diff,\,head}$ is the unfulfilled demand from the plant,
+$D_{grain}$ and $D_{pod}$ are the demands from \texttt{Grain} and
+\texttt{Pod} (\autoref{sub:Grain-(meal)-demand} and \autoref{sub:Pod-demand}),
+and $\text{\ensuremath{\Delta}}Q_{grain}$ and $\Delta Q_{pod}$ are
+the daily increments in biomass accumulated to \texttt{Grain} and
+\texttt{Pod} (before re-translocation; \autoref{eq:HeadBiomass}). 
+
+\begin{equation}
+\Delta Q_{retrans,\,stem}=\min(D_{diff},\,Q_{stem.\,non-structural}\times20\%)
+\end{equation}
+where $\Delta Q_{retrans,\,stem}$ is the dry biomass re-translocated
+from \texttt{Stem}, and $Q_{stem.\,non-structural}$ is the non-structural
+part of the \texttt{Stem} biomass (\autoref{eq:StemNonStructural}).
+\begin{equation}
+D_{diff,\,head}=D_{diff,\,head}-\Delta Q_{retrans}
+\end{equation}
+where $D_{dff,\,head}$ is updated value of the unfulfilled demand
+from the head. 
+\begin{equation}
+\Delta Q_{retrans,\,pod}=\min(D_{diff,\,head},\,Q_{pod,\,non-structural})
+\end{equation}
+where $\Delta Q_{retrans,\,pod}$ from pod is the dry biomass re-translocated
+from \texttt{Pod}, and $Q_{pod,\,non-structural}$ is the non-structural
+part of the \texttt{Pod} biomass. 
+\begin{equation}
+D_{dff,\,head}=D_{diff,\,head}-\Delta Q_{retrans,\,pod}
+\end{equation}
+where $D_{dff,\,head}$ is updated value of the unfulfilled demand
+from the head. 
+\begin{equation}
+\Delta Q_{retrans}=\Delta Q_{retrans,\,stem}+\Delta Q_{retrans,\,pod}
+\end{equation}
+where $\Delta Q_{retrans}$ is re-translocated biomass within the
+plant. 
+\begin{equation}
+\Delta Q_{grain.\,non-structural=}\Delta Q_{retrans\,to\,grain}=\frac{D_{diff,\,grain}}{D_{diff,\,head}}\Delta Q_{retrans}
+\end{equation}
+\begin{equation}
+\Delta Q_{retrans\,to\,pod}=\frac{D_{diff,\,pod}}{D_{diff,\,head}}\Delta Q_{retrans}
+\end{equation}
+\begin{equation}
+\Delta Q_{pod.\,non-structural=}\Delta Q_{retrans\,to\,pod}-\Delta Q_{retrans,\,pod}
+\end{equation}
+where $\Delta Q_{grain.\,non-structural}$ and $\Delta Q_{pod.\,non-structural}$
+are the daily increment in the non-structural part of \texttt{Grain}
+and \texttt{Pod} biomass; $\Delta Q_{retrans\,to\,grain}$ and $\Delta Q_{retrans\,to\,pod}$
+to pod are the daily biomass re-translocated to \texttt{Grain} and
+\texttt{Pod}; $D_{diff,\,grain}$ and $D_{diff,\,pod}$ are the unfulfilled
+demand of \texttt{Grain} and \texttt{Pod}, which are calculated as
+($D_{grain}-\Delta Q_{grain}$) and ($D_{pod}-\Delta Q_{pod}$), respectively. 
+
+\section{Head development}
+
+\subsection{Grain number}
+
+The number of grains per plant ($N_{g}$) is determined by the stem
+weight at anthesis.
+\begin{equation}
+N_{g}=R_{g}W_{s}
+\end{equation}
+where $W_{s}$ is the stem dry weight at anthesis, $R_{g}$ is the
+grain number per gram stem which is specified by \texttt{grain\_per\_gram\_stem}
+in wheat.xml, with default value at 25 grain g\textsuperscript{-1}.
+
+\subsection{\texttt{Grain} (\texttt{Meal}) demand\label{subsec:Grain-(meal)-demand}}
+
+The \texttt{Grain} demand (or \texttt{Meal} demand, $D_{g}$) is calculated
+in the growth phase \texttt{postflowering} (from flowering to end
+of grain filling \autoref{fig:PhenologWheatModule}). $D_{g}$ equals
+to 0 before flowering.
+
+\begin{equation}
+D_{g}=N_{g}R_{p}h_{g}(T_{mean})f_{N,\,grain}\label{eq:MealDemand}
+\end{equation}
+where $N_{g}$ is the grain number, $R_{p}$ is the potential rate
+of grain filling (0.0010 grain\textsuperscript{-1} d\textsuperscript{-1}
+from flowering to start of grain filling (\autoref{fig:PhenologWheatModule});
+0.0020 grain\textsuperscript{-1} d\textsuperscript{-1} during grain
+filling (\autoref{fig:PhenologWheatModule})), $h_{g}(T_{mean})$
+is a function of daily mean temperature which affects the rate of
+grain filling (0-1) and is defined by parameters \texttt{x\_temp\_grainfill}
+and \texttt{y\_rel\_grainfill} in wheat.xml and linearly interpolated
+by APSIM (\autoref{fig:wdTempGrainFill}).
+
+$f_{N,\,grain}$ is a nitrogen factor to grain filling.
+
+\begin{equation}
+f_{N,\,grain}=\frac{h_{N,\ poten}}{h_{N,\ min}}h_{N,\,grain}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\qquad(0\leq f_{N,\,fill}\leq1)
+\end{equation}
+where $h_{N,\ poten}$ is the potential rate of grain filling which
+is specified by \texttt{potential\_grain\_n\_filling\_rate} in wheat.xml
+and has a default value of 0.000055 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\ min}$ is the minimum rate of grain filling which is specified
+by \texttt{minimum\_grain\_n\_filling\_rate} in wheat.xml and has
+a default value of 0.000015 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\,grain}$ is a multiplier for nitrogen deficit effect on grain,
+which is specified by \texttt{n\_fact\_grain} in wheat.xml and has
+a default value of 1; $C_{N}$ is the nitrogen concentration of \texttt{Stem}
+or \texttt{Leaf} parts; $C_{N,\,crit}$ and $C_{N,\,min}$ are critical
+and minimum nitrogen concentration, respectively, for \texttt{Stem}
+and \texttt{Leaf} parts. $C_{N,\,crit}$ and $C_{N,\,min}$ are functions
+of growth stage and nitrogen concentration which is defined by parameters
+\texttt{x\_stage\_code}, \texttt{y\_n\_conc\_min\_leaf}, \texttt{y\_n\_conc\_crit\_leaf},
+\texttt{y\_n\_conc\_min\_stem}, \texttt{y\_n\_conc\_crit\_stem} in
+wheat.xml and linearly interpolated by APSIM (\autoref{fig:wdNitrogenConcentration});
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for \texttt{Leaf} (\autoref{fig:wbCO2CritLeaf}).
+
+<<wdTempGrainFill,fig.cap='Response of the factor affecting the rate of grain filling in regards to daily mean temperature.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_temp_grainfill", "y_rel_grainfill",
+		xlab = expression(paste("Daily mean temperature", ~"("*degree*"C)")),
+		ylab = 'Factor affecting the rate of grain filling')
+
+print(p)
+@
+
+<<wbCO2CritLeaf,fig.cap='The CO2 modifier for critical nitrogen concentration of Leaf.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_co2_nconc_modifier", "y_co2_nconc_modifier",
+		xlab = 'CO2 concentration',
+		ylab = 'Critical nitrogen concentration of Leaf')
+
+print(p)
+@
+
+Finally, \texttt{Grain} demand is limited by the maximum grain size
+(corresponding to $D_{gm}$)
+\begin{equation}
+\begin{array}{c}
+D_{g}=\min(D_{g},\,D_{gm})\\
+D_{gm}=N_{g}S_{gm}-Q_{meal}\qquad(D_{gm}\geq0)
+\end{array}
+\end{equation}
+where $N_{g}$ is the grain number; $Q_{meal}$ is the dry weight
+of \texttt{Meal} part (i.e. the \texttt{Grains}); $S_{gm}$ is the
+maximum grain size which is specified by max\_grain\_size in wheat.xml
+and is a cultivar-specific parameter with 0.04 g for default value.
+
+\subsection{\texttt{Pod} demand\label{subsec:Pod-demand}}
+
+\texttt{Pod} demand ($D_{p}$) is calculated by \texttt{Grain} demand
+($D_{g}$, \autoref{eq:MealDemand}) or daily biomass accumulation
+($\Delta Q$, \autoref{eq:actualBiomassProduction})
+
+\begin{equation}
+D_{p}=\begin{array}{c}
+D_{g}h_{p}(S)\qquad D_{g}\text{>0}\\
+\Delta Qh_{p}(S)\qquad D_{g}\text{=0}
+\end{array}\label{eq:GrainDemand}
+\end{equation}
+where $h_{p}(S)$ is a function of the growth stage ($S$) and of
+the \texttt{Pod} demand fraction of $D_{g}$ or $\Delta Q$. $h_{p}(S)$
+is defined by parameters \texttt{x\_stage\_no\_partition} and \texttt{y\_frac\_pod}
+in wheat.xml and linearly interpolated by APSIM (\autoref{fig:wdFractionOfPod}).
+
+<<wdFractionOfPod,fig.cap='Pod demand over the stages (fraction of Grain demand or of  daily biomass accumulation).'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_stage_no_partition", "y_frac_pod",
+		xlab = "Stage codes",
+		ylab = "Pod demand fraction of grain demand \n or daily biomass accumulation")
+
+print(p)
+@
+
+\section{Leaf and node appearance and crop leaf area}
+
+In the current version of APSIM-Wheat, wheat plants are assumed to
+be uniclum (i.e. with a single stem), meaning that tillering is not
+simulated \textit{per se}. While a node corresponds to a phytomer
+on the main stem, it actually represents all the phytomers that appear
+simultaneously on different tillers (i.e. cohort of leaves) in the
+real world.
+
+\subsection{Node number}
+
+\subsubsection{Potential node appearance rate}
+
+At emergence (\autoref{fig:PhenologWheatModule}), a number of initial
+leaves are specified by \texttt{leaf\_no\_at\_emerg,} with a default
+value of 2. The initial number of nodes is the same as the initial
+number of leaves. 
+
+During the tiller formation phase (i.e. up to 'Harvest rips', \autoref{fig:PhenologWheatModule}),
+nodes appear at a thermal time interval (the equivalent of a phyllochron
+for leaf appearance, $P_{n}$) that depends on the node number of
+the main stem ($n_{d}$, i.e. total number of nodes of the plant)
+at days after sowing ($d,$ days).
+\begin{equation}
+P_{n}=h_{P}(n_{d})\label{eq:phyllochron}
+\end{equation}
+where the function $h_{P}(n_{d})$ is defined by parameters \texttt{x\_node\_no\_app}
+and \texttt{y\_node\_app\_rate} in wheat.xml and is linearly interpolated
+by APSIM. In the current version of APSIM-Wheat, $P_{n}$ is set to
+95 $^{\circ}\text{C}$ d, meaning that the 'node phyllochron' is supposed
+to be constant (\autoref{fig:wdPhyllochron}). No effect from water
+and N stress on leaf appearance is accounted for.
+
+<<wdPhyllochron,fig.cap="Relationship function ($h_{p}(n_{d})$) between 'node phyllochron' ($P_{n}$) and the node number at main stem ($n_{d}$).">>=  
+p <- wdVisXY(wheat_xml, 
+		"x_node_no_app", "y_node_app_rate",
+		xlab = "Node number at main stem",
+		ylab = expression(paste("'Node Phyllochron", ~"("*degree*"Cd)'")))
+
+print(p)
+@
+
+\subsubsection{Potential node number (daily increase)}
+
+The potential daily increase in the node number of this unique stem
+($\Delta n_{d,\,p}$) is calculated by the daily thermal time (\autoref{fig:wdThermalTime})
+and the 'node phyllochron', and occurs during the tiller formation
+phase (\autoref{fig:PhenologWheatModule}). 
+\begin{equation}
+\Delta n_{d,\,p}=\frac{\Delta TT_{d}}{P_{n}}\label{eq:PotentialNodeNumber}
+\end{equation}
+where $\Delta TT_{d}$ is the thermal time ($^{\circ}\text{C}$d)
+at day $d$ (\autoref{fig:wdThermalTime} and \autoref{eq:thermaltime}).
+
+
+\subsection{Leaf number}
+
+\subsubsection{Potential leaf number (daily increase)}
+
+In the current version of APSIM-Wheat, all leaves appeared from a
+main and unique stem. The potential leaf number of each node is defined
+by a function ($h_{l}(n_{d})$) of node ($n_{d}$) number of day $d$
+(or 'node position'; $n_{d}$) (\autoref{fig:wdTillerNumberByNode}
+and \autoref{eq:LeafExpansionStress}). $h_{l}(n_{d})$ is specified
+by parameters \texttt{x\_node\_no\_leaf} and \texttt{y\_leaves\_per\_node}
+in wheat.xml and linearly interpolated by APSIM.
+
+At day $d$, the leaf number of the current node $n_{d}$ nodes ($N_{n,\,d,\,p}$)
+is determined by the potential leaf number $d-1$ for the past $n_{d-1}$
+nodes ($N_{n,\,d-1}$) and environmental stresses.
+
+\begin{equation}
+N_{d,\,p}=\min[N_{n,\,d-1},\;h_{l}(n_{d-1})]+[h_{l}(n_{d-1}+\Delta n_{d,\,p})-h_{l}(n_{d-1})]\times f_{S,\,expan}\label{eq:PotentialNodeNumberDaily}
+\end{equation}
+where $n_{d-1}$ is the node number at $d-1$ days after sowing, $\Delta n_{d,\,p}$
+is the potential daily increase of node number (\autoref{eq:PotentialNodeNumber}),
+$f_{S,\,expan}$ is the environmental stresses for canopy expansion.
+
+\begin{equation}
+f_{S,\,expan}=\min\{[\min(f_{N,\,expan},\;f_{p,\,expan})]^{2},\;f_{w,\,expan}\}\label{eq:LeafExpansionStress}
+\end{equation}
+where $f_{N,\,expan}$, $f_{p,\,expan}$ and $f_{w,\,expan}$ are
+the nitrogen, phosphorus and soil water stress for canopy expansion,
+respectively, which is explained in \autoref{sub:Phosphorus-stress}
+and \autoref{eq:WaterStressLeafExpansion}, respectively. 
+
+The potential daily increase in leaf number for the whole plant is
+calculated based on the potential increase for the current node and
+the potential increase in node number ($\Delta n_{d,\,p}$, \autoref{eq:PotentialNodeNumber})
+as follows.
+
+\begin{equation}
+\Delta N_{d,\,p}=N_{n,\,d}\times\Delta n_{d,\,p}
+\end{equation}
+
+<<wdTillerNumberByNode,fig.cap='Number of leaves per node as a function of the number of nodes on the main stem and unique stem considered in APSIM-Wheat ($n_{d}$). This relation corresponds the function $h_{l}(n_{d})$.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_node_no_leaf", "y_leaves_per_node",
+		xlab = "Node number on the main stem",
+		ylab = "Number of leaves per node")
+print(p)
+@
+
+\subsubsection{Actual leaf number (daily increase)}
+
+The increase in actual leaf number ($\Delta N_{d,\ LAI}$) is calculated
+in relation to the fraction between the actual and stressed increase
+of leaf area index, as follow:
+
+\begin{equation}
+\Delta N_{d,\,LAI}=\Delta N_{d,\,p}\times h_{LAI}(\frac{\Delta\text{LAI}_{d}}{\Delta\text{LAI}_{d,\,s}})\label{eq:ActualLeafNumber}
+\end{equation}
+where $h_{LAI}$ is a function between the fraction of leaf area index
+and the fraction of leaf number which is defined by parameters \hyperlink{x_lai_ratio}{x\_lai\_ratio}  
+and \hyperlink{y_leaf_no_frac}{y\_leaf\_no\_frac}   in the wheat.xml
+and linearly interpolated by APSIM (\autoref{fig:wdLAINodeNumber}).
+
+<<wdLAINodeNumber,fig.cap='Relationship between fraction of leaf area index and fraction of leaf number.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_lai_ratio", "y_leaf_no_frac",
+		xlab = 'Fraction of leaf area index',
+		ylab = 'Fraction of leaf number')
+print(p)
+@
+
+\section{Leaf area expansion}
+
+\subsection{Actual leaf area (daily increase)}
+
+At emergence (\autoref{fig:PhenologWheatModule}), an initial leaf
+area is specified for each plant by \texttt{initial\_tpla}, with a
+default value of 200 mm\textsuperscript{2} plant\textsuperscript{-1}. 
+
+During the tiller formation phase (\autoref{fig:PhenologWheatModule}),
+the daily increase in leaf area index ($\Delta\text{LAI}_{d}$) is
+the minimum between \textquoteleft stressed\textquoteright{} leaf
+area index ($\Delta\text{LAI}_{d,\,s}$) and the carbon-limited leaf
+area index ($\Delta\text{LAI}_{d,\,c}$). 
+
+\begin{equation}
+\Delta\text{LAI}_{d}=\min(\Delta\text{LAI}_{d,\,s},\;\Delta\text{LAI}_{d,\,c})
+\end{equation}
+
+
+\subsection{\textquotedblleft Stressed\textquotedblright{} leaf area}
+
+During the tiller formation phase, the ``stressed'' daily increase
+in leaf area ($\Delta LAI_{d,s}$) is calculated as the potential
+increase in LAI reduced by environmental factors.
+\begin{equation}
+\Delta\text{LAI}_{d,\,s}=\Delta\text{LAI}_{d,\,p}\times\min(f_{w,\;expan},\,f_{N,\,expan},\,f_{P,\,expan})\label{eq:StressLeafArea}
+\end{equation}
+where $f_{N,\,expan}$, $f_{p,\,expan}$ and $f_{w,\,expan}$ are
+the nitrogen, phosphorus and soil water stress factors concerning
+canopy expansion, respectively (\autoref{eq:NStressLeafExpansion},
+\autoref{sub:Phosphorus-stress} and \autoref{eq:WaterStressLeafExpansion}).
+
+The potential daily increase of leaf area ($\Delta\text{LAI}_{d,\,p}$)
+is calculated by the potential daily increase in leaf number and leaf
+size. 
+
+\begin{equation}
+\Delta\text{LAI}_{d,\,p}=\Delta N_{d,\,p}\times L_{n}\times D_{p}
+\end{equation}
+where $\Delta N_{d,\,p}$ is the potential increase in leaf number
+(for the whole plant), $D_{p}$ is the plant population, and $L_{n}$
+is the potential leaf area for leaves of the ``current'' node (this
+corresponds to the new potential leaf area produced by the different
+tillers in the real world) and depends on the node number on the main
+and unique stem considered by APSIM-Wheat.
+\begin{equation}
+L_{n}=h_{ls}(n_{d}+n_{0})
+\end{equation}
+where $n_{0}$ is the growing leaf number in the sheath (\texttt{node\_no\_correction}
+in wheat.xml) and equals to 2 as default value. The function $h_{ls}(n_{d})$
+is defined by parameters \texttt{x\_node\_no} and \texttt{y\_leaf\_size}
+in wheat.xml and linearly interpolated by APSIM (\autoref{fig:wdLeafSizeByNode}).
+
+<<wdLeafSizeByNode,fig.cap='Leaf area per node ($L_{n}$) in regards to the main stem node number $n_{0} + n_{d}$.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_node_no", "y_leaf_size ",
+		xlab = "Main stem node number",
+		ylab = expression(paste("Potential leaf area per node", ~"("*mm^2*")")))
+print(p)
+@
+
+\subsection{Carbon-limited leaf area}
+
+Leaf area related to carbon production is calculated by the increase
+in leaf dry weight ($\Delta Q_{leaf}$ \autoref{eq:actualBiomassProduction})
+and the maximum specific leaf area ($\text{SLA}_{max}$), which is
+related to leaf area index (LAI).
+
+\begin{equation}
+\Delta\text{LAI}_{d,\,c}=\Delta Q_{leaf}\times\text{SLA}_{max}
+\end{equation}
+\begin{equation}
+\text{SLA}{}_{max}=h_{SLA}(\text{LAI})
+\end{equation}
+This function is defined by parameters \texttt{x\_lai} and \texttt{y\_sla\_max}
+in wheat.xml and linearly interpolated by APSIM (\autoref{fig:wdSLA}).
+
+<<wdSLA,fig.cap='Relationship between maximum specific leaf area and leaf area index.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_lai", "y_sla_max",
+		xlab = expression(paste("Leaf area index", ~"("*mm^2*" "*mm^{-2}*")")),
+		ylab = expression(paste("Maximum specific leaf area", ~"("*mm^2*" "*g^{-1}*")")))
+print(p)
+@
+
+\section{Root growth and distribution}
+
+\subsection{Root depth growth}
+
+Between germination and start of grain filling (\autoref{fig:PhenologWheatModule}),
+the increase in root depth ($\Delta D_{r}$) is a daily rate multiplied
+by a number of factors. Daily root depth growth ($\Delta D_{r}$)
+is calculated by root depth growth rate ($R_{r}$), temperature factor
+($f_{rt}$), soil water factor ($f_{rw}$), and soil water available
+factor ($f_{rwa}$) and root exploration factor ($\text{XF}(i)$).
+
+\begin{equation}
+\Delta D_{r}=R_{r}\times f_{rt}\times\min(f_{rw},\;f_{rwa})\text{\ensuremath{\times}XF}(i)\label{eq:rootDepthGrowth}
+\end{equation}
+where $i$ is the soil layer number in which root tips are growing.
+Root depth growth rate is a function of growth stage, which is defined
+by parameters \texttt{stage\_code\_list} and \texttt{root\_depth\_rate}
+in the wheat.xml and is linearly interpolated by APSIM (\autoref{fig:wdRootGrowthRate}). 
+
+<<wdRootGrowthRate,fig.cap='Relationship between root depth growth rate ($R_{r}$) and growth stages.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"stage_code_list", "root_depth_rate",
+		xlab = "Stage codes",
+		ylab = "Root depth growth rate (mm/d)")
+print(p)
+@
+
+The temperature factor ($f_{rt}$) is calculated by daily mean temperature.
+
+\begin{equation}
+f_{rt}=h_{rt}(\frac{T_{max}+T_{min}}{2})\label{eq:RootGrowthTemperature}
+\end{equation}
+where $h_{rt}$ is a function of factor of temperature on root length
+and daily mean temperature and is defined by parameters \texttt{x\_temp\_root\_advance}
+and \texttt{y\_rel\_root\_advance} in the wheat.xml which is linearly
+interpolated by APSIM (\autoref{fig:wdTempRootFactor}). 
+
+<<wdTempRootFactor,fig.cap='Relationship ($h_{rt}$) between temperature factor on root length and daily mean temperature.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_temp_root_advance", "y_rel_root_advance",
+		xlab = expression(paste("Mean daily temperature", ~"("*degree*"C)")),
+		ylab = "Temperature factor on root length")
+print(p)
+@
+
+The soil water factor ($f_{rw}$) is calculated by soil water stresses
+of photosynthesis ($f_{w,\,photo}$, \autoref{eq:swstressphoto}).
+
+\begin{equation}
+f_{rw}=h_{rw}(f_{w,\,photo})
+\end{equation}
+where $h_{rw}$ is a function of soil-water factor affecting root
+depth growth in response to soil water stress for photosynthesis.
+This function is defined by parameters \texttt{x\_ws\_root} and \texttt{y\_ws\_root\_fac},
+which are linearly interpolated by APSIM. The default value of $f_{rw}$
+is 1, i.e. there is no soil water stress on root depth growth in current
+APSIM-Wheat.
+
+The soil water available factor ($f_{rwa}$) is calculated by fraction
+of available soil water.
+
+\begin{equation}
+f_{rwa}=h_{rwa}(\text{FASW})\label{eq:Soilwateravailablefactor}
+\end{equation}
+where $h_{rwa}$ is a function of the fraction of available soil water
+(FASW) is defined in wheat.xml by parameters \texttt{x\_sw\_ratio}
+and \texttt{y\_sw\_fac\_root} which is linearly interpolated by APSIM
+(\autoref{fig:wdWaterAvaiOnRoot}). 
+
+<<wdWaterAvaiOnRoot,fig.cap='Available soil water fraction ($f_{rwa}$) in response to the fraction of available soil water (FASW).'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_sw_ratio", "y_sw_fac_root",
+		xlab = "Fraction of available soil water",
+		ylab = "Stress factor for root depth growth")
+print(p)
+@
+
+The fraction of available soil water (FASW) is calculated by a fraction
+of root dpeth in soil layer $i$ ($D_{r}(i)$) and depth of soil layer
+$i$ ($D_{s}(i)$), and FASW at layer $i+1$ and $i$.
+
+\begin{equation}
+\text{FASW}=\frac{D_{r}(i)}{D_{s}(i)}\text{FASW}(i+1)+(1-\frac{D_{r}(i)}{D_{s}(i)})\text{FASW}(i)
+\end{equation}
+where $\text{FASW}(i)$ is the fraction of available soil water in
+ soil layer $i$. $D_{r}(i)$ is the root depth within the deepest
+soil layer ($i$) where roots are present , $D_{s}(i)$ is the thickness
+of this layer $i$, and 
+
+\begin{equation}
+\text{FASW}(i)=\frac{\text{SW}(i)-\text{LL}(i)}{\text{DUL}(i)-\text{LL}(i)}
+\end{equation}
+where $\text{SW}(i)$ is the soil water content at layer $i$ (mm),
+$\text{LL}(i)$ is the lower limit of plant-extractable soil water
+in layer $i$ (mm), $\text{DUL}(i)$ is drained upper limit soil water
+content in soil layer $i$ (mm). $\text{XF}(i)$, $\text{SW}(i)$,
+$\text{LL}(i)$ and $\text{DUL}(i)$ are specified at the soil module
+of APSIM simulation files.
+
+Finally, \autoref{eq:rootDepthGrowth} is reduced to this function.
+\begin{equation}
+\Delta D_{r}=R_{r}\times f_{rt}\times f_{rwa}\text{\ensuremath{\times}XF}(i)\label{eq:rootDepthGrowth-1}
+\end{equation}
+
+Overall, root depth is constrained by the soil profile depth. The
+optimum root expansion rate is 30 mm d\textsuperscript{-1} (\autoref{fig:wdRootGrowthRate}).
+This can be limited by supra- or sub-optimal mean air temperatures
+(\autoref{fig:wdTempRootFactor}). Dry soil can slow root depth progression
+if the soil water content is less than 25\% of the extractable soil
+water (drained upper limit - lower limit) in the layers they are about
+to reach (\autoref{fig:wdWaterAvaiOnRoot}). The increase of root
+depth through a layer can also be reduced by knowing soil constraints
+(soil compression) through the use of the 0-1 parameter XF, which
+is input for each soil layer. Root depth is used by APSIM to calculate
+soil available water (e.g \autoref{sec:Crop-Water-Relations}).
+
+\subsection{Root length}
+
+Daily root length growth is calculated by daily growth of \texttt{Root}
+biomass ($\Delta Q_{root}$, \autoref{eq:RootBiomass}) and specific
+root length ($\text{SRL}$, defined by \texttt{specific\_root\_length}
+in wheat.xml with a default value of 105000 mm g\textsuperscript{-1}).
+\begin{equation}
+\Delta L_{r}=\Delta Q_{root}\times\text{SRL}
+\end{equation}
+
+The daily root length growth ($\Delta L_{r}$) is distributed to each
+soil layer $i$ according to root depth and soil water availability
+in soil layer $i$.
+\begin{equation}
+\Delta D_{r}(i)=\frac{f_{rl}(i)}{\sum_{j=1}^{N}f_{rl}(j)}
+\end{equation}
+where $f_{rl}(i)$ is a factor of root length growth in  soil layer
+$i$.
+\begin{equation}
+f_{rl}(i)=f_{rwa}\times f_{b}(i)\text{\ensuremath{\times}XF}(i)\times\frac{D_{s}(i)}{D_{r}}\,
+\end{equation}
+where $\Delta L_{r}(i)$ is the daily root length growth for soil
+layer $i$, $D_{s}(i)$ is the depth of the soil layer $i$, $D_{r}$
+is total root depth from the previous day, $\text{XF}(i)$ is root
+exploration factor in  soil layer $i$, $f_{rwa}$ is soil water available
+factor (\autoref{eq:Soilwateravailablefactor}), \textbf{$f_{b}(i)$
+}is branch factor at layer $i$.
+\begin{equation}
+f_{b}(i)=h_{b}(\frac{L_{r}(i)}{D_{p}D_{s}(i)})
+\end{equation}
+where $L_{r}(i)$ is the root length in  soil layer $i$, $D_{p}$
+is plant population, $h_{b}$ is a function for branch factor that
+is defined by parameters \texttt{x\_plant\_rld} and \texttt{y\_rel\_root\_rate}
+in the wheat.xml and linearly interpolated by APSIM (\autoref{fig:wdRootBranching}). 
+
+<<wdRootBranching,fig.cap='Root branching factor in response to root branching.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_plant_rld", "y_rel_root_rate",
+		xlab = "Root branching (mm/mm3/plant)",
+		ylab = "Root branching factor")
+print(p)
+@
+
+Root length has no effect on other traits in the current version of
+APSIM-Wheat. It is just used by the root senescence routine.
+
+\section{Senescence}
+
+\subsection{Leaf number senescence}
+
+The leaf senescence phase begins 40\% between floral initiation and
+end of juvenile, and ends at harvest ripe (\autoref{fig:PhenologWheatModule}),
+at which stage, all green leaves are dead. During leaf senescence
+phase (\autoref{fig:PhenologWheatModule}), leaf number senescence
+is calculated by daily thermal time ($\Delta TT$, \autoref{eq:thermaltime})
+as follows:
+\begin{equation}
+\Delta N_{d,\,sen}=\Delta TT\times\frac{f_{sen,\,l}\times N_{d}}{r_{sen,\,l}}
+\end{equation}
+where $N_{d}$ is the total leaf number; $f_{sen,\,l}$ is the fraction
+of the total leaf number senescing per main stem node and specified
+by \texttt{fr\_lf\_sen\_rate} in wheat.xml (default value 0.035);
+$r_{sen,\,l}$ is the rate of node senescence on main stem and specified
+by \texttt{node\_sen\_rate} in wheat.xml (default value 60.0 $^{\circ}$Cd
+node\textsuperscript{-1}). 
+
+\subsection{Leaf area senescence}
+
+There are five causes of leaf senescence: age ($\text{\ensuremath{\Delta}LAI}_{sen,\,age}$),
+water stress ($\text{\ensuremath{\Delta}LAI}_{sen,\,sw}$), light
+intensity ($\text{\ensuremath{\Delta}LAI}_{sen,\,light}$), frost
+($\text{\ensuremath{\Delta}LAI}_{sen,\,frost}$) and heat ($\text{\ensuremath{\Delta}LAI}_{sen,\,heat}$).
+The maximum of these causes is the day's total leaf area index senescence.
+\begin{equation}
+\text{\ensuremath{\Delta}LAI}_{sen}=\max(\text{\ensuremath{\Delta}LAI}_{sen,\,age},\;\text{\ensuremath{\Delta}LAI}_{sen,\,sw},\;\Delta\text{LAI}_{sen,\,light},\;\text{\ensuremath{\Delta}LAI}_{sen,\,frost},\;\text{\ensuremath{\Delta}LAI}_{sen,\,heat})
+\end{equation}
+
+Leaf area senescence caused by age corresponds to the leaf area of
+the number of leaves senesced ($\Delta N_{d,\,sen}$) from the lowest
+leaf position.
+
+Leaf area senescence caused by soil water ($\text{\ensuremath{\Delta}LAI}_{sen,\,sw}$)
+is calculated as follows.
+
+\begin{equation}
+\text{\ensuremath{\Delta}LAI}_{sen,\,sw}=k_{sen,\,sw}\times(1-f_{sw,\,photo})\times\text{LAI}
+\end{equation}
+where $k_{sen,\,sw}$ is the slope of the linear equation relating
+to soil water stress to leaf senescence rate and is specified by \texttt{sen\_rate\_water}
+in wheat.xml (default value 0.10); $f_{sw,\,photo}$ is soil water
+stress for photosynthesis (\autoref{eq:swstressphoto}); LAI is the
+leaf area index.
+
+Leaf area senescence caused by light intensity ($\text{\ensuremath{\Delta}LAI}_{sen,\,light}$)
+is calculated as follows:
+
+\begin{equation}
+\text{\ensuremath{\Delta}LAI}_{sen,\,light}=k_{sen,\,light}\times(\text{LAI}-\text{LAI}_{c,\,light})\times\text{LAI}\quad\text{LAI}>\text{LAI}_{c,\,light}\label{eq:SensLight}
+\end{equation}
+where $k_{sen,\,light}$ is sensitivity of leaf area senescence to
+shading and is specified by \texttt{sen\_light\_slope} in wheat.xml
+(default value 0.002); $\text{LAI}_{c,\,light}$ is the critical LAI
+when shading is starting to cause leaf area senescence and is specified
+by \texttt{lai\_sen\_light} in wheat.xml (default value 7).
+
+The leaf area senescence caused by frost is a ratio of LAI.
+
+\begin{equation}
+\text{\ensuremath{\Delta}LAI}_{sen,\,frost}=k_{sen,\,frost}\text{\ensuremath{\times}LAI}\label{eq:SensFrost}
+\end{equation}
+where $k_{sen,\,frost}$ is a function of daily minimum temperature
+and is defined by parameters \texttt{x\_temp\_senescence} and \texttt{y\_senescence\_fac}
+in wheat.xml, which are linearly interpolated by APSIM. The default
+value of $k_{sen,\,frost}$ is zero, i.e. there is no frost stress
+in leaf area in the current APSIM-Wheat module.
+
+Senescence by heat calculation has been added in APSIM 7.5. The leaf
+area senescence by heat is a ratio of LAI \citep{asseng2011theimpact}.
+
+\begin{equation}
+\text{\ensuremath{\Delta}LAI}_{sen,\,heat}=k_{sen,\,heat}\times\text{LAI}\label{eq:SensHeat}
+\end{equation}
+
+where $k_{sen,\,heat}$ is a function of daily maximum temperature
+which is defined by parameters \texttt{x\_maxt\_senescence} and \texttt{y\_heatsenescence\_fac}
+in wheat.xml which are linearly interpolated by APSIM. 
+
+<<wdHeatSenescence,fig.cap='Fraction of senescence of leaf area index ($k_{sen,\\,heat}$) in response to maximum temperature.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_maxt_senescence", "y_heatsenescence_fac",
+		xlab = expression(paste("Maximum temperature", ~"("*degree*"C)")),
+		ylab = "Senescence fraction of LAI")
+print(p)
+@
+
+The total leaf area of plant must be more than the minimum plant area
+(\texttt{min\_tpla}), which has default value 5 mm$^{\text{2}}$ plant$^{\text{-1}}$.
+When some leaves are senesced, only a small amount of nitrogen is
+retained in the senesced leaf, the rest is made available for re-translocation
+included into the \texttt{Stem} N pool (\autoref{sub:NitrogenPartitioningAndRetranslocation}).
+The concentration of nitrogen in senesced material is specified in
+wheat.xml.
+
+\subsection{Biomass senescence}
+
+Leaf biomass senescence $\Delta Q_{sl}$ is the ratio of leaf area
+senescence ($\text{\ensuremath{\Delta}LAI}_{sen}$) with total the
+green LAI at the time considered (LAI). 
+\begin{equation}
+\Delta Q_{sl}=\Delta Q_{l}\frac{\text{\ensuremath{\text{\ensuremath{\Delta}LAI}_{sen}}}}{\text{LAI}}
+\end{equation}
+where $\Delta Q_{l}$ is the daily increase of leaf biomass.
+
+\subsection{Root senescence}
+
+A rate of 0.5\% of root biomass and root length is senesced each day
+and detaches immediately being sent to the soil nitrogen module and
+distributed as fresh organic matter in the profile.
+
+\begin{equation}
+\Delta Q_{sen,\,root}=\Delta Q_{root}\times f_{sen,\,root}
+\end{equation}
+where $\Delta Q_{sen,\,root}$ is the daily \texttt{Root} senesced
+biomass, and $f_{sen,\,root}$ is the fraction of senesced root biomass,
+which is defined in \texttt{x\_dm\_sen\_frac\_root} and \texttt{y\_dm\_sen\_frac\_root}
+in wheat.xml (\autoref{fig:wdRootSens})
+
+<<wdRootSens,fig.cap='Fraction of senescence of root biomass.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_dm_sen_frac_root", "y_dm_sen_frac_root",
+		xlab = 'Fraction of material senescence',
+		ylab = "Senescence fraction of Root biomass")
+print(p)
+@
+
+\begin{equation}
+\Delta L_{sen,\,root}=\Delta Q_{sen,\,root}\times\text{SRL}
+\end{equation}
+where $\Delta L_{sen,\,root}$ is the daily root length senescence,
+and SRL is the specific root length. 
+
+Root senescence occurs in each of the soil layers where roots are
+present, as a proportion of the total root length.
+\begin{equation}
+\Delta L_{sen,\,root}(i)=\Delta L_{sen,\,root}\times\frac{L_{r}(i)}{\sum_{j=1}^{i}L_{r}(j)}
+\end{equation}
+where $L_{sen,\,root}(i)$ is the root length senescence in soil layer
+$i$, $L_{r}(i)$ is root length in layer $i$, and $\sum_{j=1}^{i}L_{r}(j)$is
+the total root length for all the layers where root are present.
+
+\section{Crop Water Relations\label{sec:Crop-Water-Relations}}
+
+\subsection{Crop water demand\label{subsec:Crop-water-demand}}
+
+Following \citet{sinclair1986waterand}, transpiration demand is modeled
+as a function of the current day's potential crop growth rate, estimated
+by the potential biomass accumulation associated with intercepted
+radiation ($\Delta Q_{r}$, see \autoref{eq:BiomassProduction}),
+divided by the transpiration efficiency.
+\begin{equation}
+W_{d}=\frac{\Delta Q_{r}-R}{TE}\label{eq:soilWaterDemand}
+\end{equation}
+where $R$ is respiration rate and equal to zero in the current version
+of APSIM-Wheat, $TE$ is transpiration efficiency. $TE$ is related
+to the daylight averaged vapour pressure deficit ($VPD$, \autoref{eq:VPD})
+and a multiple of CO\textsubscript{2} factor \citep{reyenga1999modelling}.
+\begin{equation}
+TE=f_{c,\,TE}\frac{f_{TE}}{VPD}\label{eq:TranspirationEfficiency}
+\end{equation}
+where $f_{c,\,TE}$ is the CO\textsubscript{2} factor for transpiration
+efficiency, which is a function of carbon dioxide concentration and
+is defined by parameters \texttt{x\_co2\_te\_modifier} and \texttt{y\_co2\_te\_modifier}
+in wheat.xml and linearly interpolated by APSIM (\autoref{fig:wdCO2TE}).
+$f_{c,\,TE}$ linearly increases from 1 to 1.37 when CO\textsubscript{2}
+concentration increases from 350 ppm to 700 ppm \citep{reyenga1999modelling}.
+$f_{TE}$ is the coefficient of transpiration efficiency, which values
+are defined in wheat.xml by parameters \texttt{transp\_eff\_cf} in
+wheat.xml for the different growth stages and are linearly interpolated
+by APSIM (\autoref{fig:wdCoefficientOfTE}). 
+
+<<wdCO2TE,fig.cap='Relationship between factor of carbon dioxide for transpiration efficiency ($f_{c,\\, TE}$) and CO2 concentration.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_co2_te_modifier", "y_co2_te_modifier",
+		xlab = "Carbon dioxide concentration",
+		ylab = "Transpiration efficiency factor")
+print(p)
+@
+
+<<wdCoefficientOfTE,fig.cap='Change in the coefficient of transpiration efficiency with growth stages.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"stage_code", "transp_eff_cf",
+		xlab = "Stage",
+		ylab = "Coefficient of \ntranspiration efficiency")
+print(p)
+@
+
+$VPD$ is the vapour pressure deficit, which is estimated using the
+method proposed by \citet{tanner1983efficient} and only requires
+daily maximum and minimum temperatures.
+
+\begin{equation}
+VPD=f_{v}[6.1078\times\exp(\frac{17.269\times T_{max}}{237.3+T_{max}})-6.1078\times\exp(\frac{17.269\times T_{min}}{237.3+T_{min}})]\label{eq:VPD}
+\end{equation}
+In this method, it is assumed that the air is saturated at the minimum
+temperature. The saturated vapour pressure is calculated at both the
+maximum and minimum temperatures, and the default vapour pressure
+deficit for the day is taken as 75\% ($f_{v}$, defined by \texttt{svp\_fract}
+in wheat.xml) of the difference between these two vapour pressures. 
+
+Crop water demand is capped to below a given multiple of potential
+ET (taken as Priestly-Taylor Eo from the water balance module) as
+specified by \hyperlink{eo_crop_factor_default}{eo\_crop\_factor\_default}  
+in the wheat.xml file (default value 1.5). This limits water use to
+reasonable values on days with high VPD or in more arid environments.
+
+\subsection{Potential and actual extractable soil water}
+
+Potential and actual extractable soil water is the sum of root water
+contents available to the crop from each profile layer occupied by
+roots. If roots are only partially through a layer available soil
+water is scaled to the portion that contains roots. Potential extractable
+soil water ($\text{ESW}{}_{p}$) is the difference between drained
+upper limit soil water content (DUL) and lower limit of plant-extractable
+soil water (LL) for each soil layer. The actual extractable soil water
+($esw_{a}$) is the difference between the soil water content (SW)
+and lower limit of plant-extractable soil water (LL) for each soil
+layer.
+\begin{equation}
+\begin{array}{c}
+\text{ESW}_{p}(i)=\text{DUL}(i)-\text{LL}(i)\\
+\text{ESW}a(i)=\text{SW}(i)-\text{LL}(i)\\
+\text{ESW}_{p}=\sum_{i=1}^{I}[\text{DUL}(i)-\text{LL}(i)]\\
+\text{ESW}_{a}=\sum_{i=1}^{I}[\text{SW}(i)-\text{LL}(i)]
+\end{array}\label{eq:SoilWaterESW}
+\end{equation}
+where $i$ indicates soil layers (where roots are present), and $I$
+indicates the deepest soil water of root presented. Similar variables
+are calculated for the entire soil profile (i.e. roots may not occupy
+all the layers). 
+\begin{equation}
+\begin{array}{c}
+\text{PAWC}=\sum_{i}^{N_{s}}[\text{DUL}(i)-\text{LL}(i)]\\
+\text{ESW}=\sum_{i}^{N_{s}}[\text{SW}(i)-\text{LL}(i)]
+\end{array}
+\end{equation}
+where $i$ indicates soil layers, $N_{s}$ indicates the number of
+soil layers, and PAWC is the plant available water capacity. 
+
+\subsection{Crop water supply, i.e. potential soil water uptake}
+
+The APSIM-Wheat module can be coupled to either the SWIM2 module (see
+module documentation) or the SOILWAT2 module (default). When the APSIM-Wheat
+module is coupled to APSIM-SOILWAT2, potential soil water uptake (or
+water supply, $W_{s}$) is calculated using the approach first advocated
+by Monteith (1986). Crop water supply is considered as the sum of
+potential root water uptake from each profile layer occupied by root.
+If roots are only partially through a layer available soil water is
+scaled to the portion that contains roots. The potential rate of extraction
+in a layer is calculated using a rate constant (KL) as actual extractable
+soil water. The KL defines the fraction of available water able to
+be extracted per day. The KL factor is empirically derived, incorporating
+both plant and soil factors which limit rate of water uptake. Root
+water extraction values (KL) must be defined for each combination
+of crop species and soil type.
+\begin{equation}
+\begin{array}{c}
+\begin{array}{cc}
+W_{s}(i) & =\text{KL}(i)[\text{SW}(i)-\text{LL}(i)]\qquad\qquad if\,i\leq I-1\\
+ & =\frac{D_{r}(i)}{D_{s}(i)}\text{KL}(i)[\text{SW}(i)-\text{LL}(i)]\qquad\qquad if\,i=I
+\end{array}\\
+W_{s}=\sum_{i=1}^{I}W_{s}(i)
+\end{array}\label{eq:WaterSupply}
+\end{equation}
+where $i$ is the soil layer, $I$ is the deepest soil layer where
+roots are present, $W_{s}(i)$ is the water supply available from
+layer $i$, $W_{s}$ is the crop water supply, $\text{SW}(i)$ is
+the soil water content in layer $i$, $\text{LL}(i)$ is the lower
+limit of plant-extractable soil water in layer $i$, $\text{KL}(i)$
+is the root water extraction values in layer $i$, $D_{r}(i)$ is
+the root depth within the soil layer ($i$) where roots are present,
+and $D_{s}(i)$ is the thickness of this layer $i$. 
+
+\subsection{Actual soil water uptake}
+
+The actual rate of water uptake is the lesser of the potential soil
+water supply ($W_{s}$, \autoref{eq:WaterSupply}) and the soil water
+demand ($W_{d}$, \autoref{eq:soilWaterDemand}), which is determining
+whether biomass production is limited by radiation or water uptake
+(\autoref{eq:actualBiomassProduction})
+
+\begin{equation}
+W_{u}=\min(W_{d},\,W_{s})\label{eq:WaterUpdate}
+\end{equation}
+If the potential soil water supply (accessible by the roots) exceeds
+the crop water demand, then the actual soil water uptake ($W_{u}$)
+is removed from the occupied layers in proportion to the values of
+potential root water uptake in each layer. If the computed soil water
+supply from the profile is less than the demand then, and the actual
+root water uptake from a layer is equal to the computed potential
+uptake. If there are not soil water supply and demand, soil water
+update equals to zero.
+\begin{equation}
+\begin{array}{c}
+\Delta W_{s}(i)=-W_{s}(i)\times\frac{W_{d}}{W_{s}}\qquad if\;W_{s}<W_{d}\\
+\Delta W_{s}(i)=-W_{s}(i)\qquad if\;W_{s}>W_{d}\\
+\Delta W_{s}(i)=0\qquad if\;W_{s}=W_{d}=0
+\end{array}
+\end{equation}
+where $\Delta W_{s}(i)$ is the daily change in soil water content
+at layer $i$ (where roots are present), and $W_{s}(i)$ is the water
+supply available from layer $i$ (\autoref{eq:WaterSupply}) .
+
+\subsection{Soil water stresses affecting plant growth}
+
+Soil water deficit factors are calculated to simulate the effects
+of water stress on different plant growth-and-development processes.
+Three water deficit factors are calculated which correspond to four
+plant processes, each having different sensitivity to water stress
+i.e. photosynthesis, leaf expansion, and phenology. 
+
+Each of these factors is capped between 0 and 1, where the value of
+0 corresponds to a complete stress, while 1 corresponds to no stress.
+
+Leaf expansion is considered more sensitive to stress than photosynthesis,
+while soil water has no impact on crop phenology in the current APSIM-Wheat
+version. 
+
+\subsubsection{Phenology}
+
+Soil water stress of phenology is determined by the soil water deficiency. 
+
+\begin{equation}
+f_{W,\,pheno}=h_{w,\,pheno}(\frac{esw_{a}}{esw_{p}})\label{eq:SoilWaterStress}
+\end{equation}
+where $esw_{a}$ is the actual extractable soil water in root layers,
+$esw_{p}$ is the potential extractable soil water in root layers.
+$h_{w,\,pheno}$ is a function of soil water available ratio and soil
+water stress, which is defined by parameters \texttt{x\_sw\_avail\_ratio}
+and \texttt{y\_swdef\_pheno} (default value 1) in wheat.xml and linearly
+interpolated by APSIM. In the current version of APSIM-Wheat module,
+no soil water stress for phenology is applied (\autoref{fig:wdSoilWaterStressPhenology}).
+The soil water stress of phenology for flowering (\texttt{x\_sw\_avail\_ratio\_flowering}
+and \texttt{y\_swdef\_pheno\_flowering}) and grain filling (\texttt{x\_sw\_avail\_ratio\_start\_grain\_fill}
+and \texttt{y\_swdef\_pheno\_start\_grain\_fill}) phases are calculated
+in the source code, but don't have influence on the phenology of wheat
+in the current APSIM-Wheat version (default value of 1).
+
+<<wdSoilWaterStressPhenology,fig.cap='Relationship between soil water stress factor affecting phenology ($f_{W,\\, pheno}$) and the ratio of available soil water ($\\frac{esw_{a}}{esw_{p}}$).'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_sw_avail_ratio", "y_swdef_pheno ",
+		xlab = "Ratio of available soil water",
+		ylab = "Soil water stress \nof phenology")
+print(p)
+@
+
+\subsubsection{Photosynthesis}
+
+Soil water stress of biomass accumulation ($f_{w,\,photo}$) is calculated
+as follows.
+\begin{equation}
+f_{w,\,photo}=\frac{W_{u}}{W_{d}}\label{eq:swstressphoto}
+\end{equation}
+where $W_{u}$ is the total daily water uptake from root system (\autoref{eq:WaterUpdate}),
+$W_{d}$ is the soil water demand of \texttt{Leaf} and \texttt{Head}
+parts (\autoref{eq:soilWaterDemand}). 
+
+Finally, the potential biomass production (radiation-limited$\Delta Q$)
+can limit by water uptake ($f_{w,\,photo}<1$, i.e. when $W_{u}<W_{d}$),
+or not (when $f_{w,\,photo}=1$, i.e. when $W_{u}=W_{d}$)
+
+\begin{equation}
+\Delta Q_{w}=\Delta Q_{r}f_{w,\,photo}=\Delta Q_{r}\frac{W_{u}}{W_{d}}\label{eq:WaterStressBiomassProduction}
+\end{equation}
+
+$f_{w,photo}$ also affect the senescence of the leaves.
+
+\subsubsection{Leaf expansion}
+
+Soil water stress of leaf expansion is determined by the deficit of
+soil water. 
+
+\begin{equation}
+f_{W,\,expan}=h_{w,\,expan}(\frac{W_{u}}{W_{d}})\label{eq:WaterStressLeafExpansion}
+\end{equation}
+where $W_{u}$ is the crop water uptake (\autoref{eq:WaterUpdate}),
+$W_{d}$ is the crop water demand (\autoref{eq:soilWaterDemand}).
+$h_{w,\,expan}$ is a function of soil water content and stress, and
+is defined by parameters \texttt{x\_sw\_demand\_ratio} and \texttt{y\_swdef\_leaf}
+in the wheat.xml, which is linearly interpolated by APSIM (\autoref{fig:wdWaterStress4LeafExpansion}). 
+
+<<wdWaterStress4LeafExpansion,fig.cap='Relationship between the soil water stress factor affecting expansion ($f_{W,\\, expan}$) and supply:demand ratio ($\\frac{W_{e}}{W_{d}}$).'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_sw_demand_ratio", "y_swdef_leaf",
+		xlab = "Soil water supply:demand ratio",
+		ylab = "Soil water stress of expansion")
+print(p)
+@
+
+\subsection{KL factor}
+
+APSIM 7.5 introduces a modifying factor on KL (rate of maximum daily
+water uptake per day) where there is an excess of chloride concentration
+(Cl), exchangeable sodium percentage (ESP), or electrical conductivity
+(EC) properties in the soil \citep{hochman2007simulating}. The KL
+modifier is optional and triggered by setting the ModifyKL parameter
+to \textquoteleft yes\textquoteright .
+
+When the KL modifier is activated, KL values are modified for each
+layer, by factors (concerning Cl, ESP, EC; \autoref{fig:wdKLFactoring})
+applied to default KL values. The modifiers are calculated using one
+of the limiting factors in order of preference (Cl, ESP, EC), i.e.
+KL is modified only if there are no soil parameters for Cl. The parameters
+in the wheat.xml that control this mechanism are ClA, CLB, ESPA, ESPB,
+ECA, ECB (slope and intercept of linear relationship for Cl, ESP and
+EC).
+
+<<wdKLFactoring,fig.height=6,fig.cap='The KL factor in response to chloride concentration (Cl mg kg$^{-1}$, Exchangeable sodium percentage (ESP, \\%) and soil electrical conductivity (EC, dS m$^{-1}$.'>>=  
+p <- wdKLFactoring(wheat_xml)
+print(p)
+@
+
+\section{Nitrogen}
+
+The nitrogen stress phase begins before 30\% floral initiation to
+finish at the 'harvest ripe' phase (\autoref{fig:PhenologWheatModule}),
+which are defined by \texttt{n\_stress} in wheat.xml.
+
+\subsection{Nitrogen supply}
+
+Ammonium ($\text{NH}_{4}^{+}$) is not taken up in wheat as wheat.xml
+parameter knh4 (constant for NH\textsubscript{4} extraction) is equal
+to 0. 
+
+The model uses a simplified formulation for nitrate $\text{NO}_{3}^{-}$
+uptake somewhat similar in structure to that employed in water uptake.
+During the nitrogen stress phase (\autoref{fig:PhenologWheatModule}),
+nitrogen supply for soil layer $i$ ($N_{s}(i)$, g m\textsuperscript{-2})
+is calculated as follows:
+
+\begin{equation}
+N_{s}(i)=K_{NO3}N(i)[N(i)\frac{1000}{\text{BD}(i)D_{s}(i)}]\frac{\text{\text{ESW}}_{a}(i)}{\text{ESW}_{p}(i)}
+\end{equation}
+where $K_{NO3}$ is a constant of extractable soil nitrogen, which
+is defined by \texttt{kno3} with default value 0.02; $N(i)$ is the
+$\text{NO}_{3}^{-}$concentration in soil layer $i$ (g m\textsuperscript{-2});
+$\text{BD}(i)$ is the bulk density of soil layer $i$ (g cm\textsuperscript{-3});
+$D_{s}(i)$ is the depth of soil layer $i$ (cm); $\text{ESW}_{a}(i)$
+is the actual extractable soil water in soil layer $i$ (\autoref{eq:SoilWaterESW});
+$\text{ESW}{}_{p}(i)$ is the potential extractable soil water in
+soil layer $i$ (\autoref{eq:SoilWaterESW}). 
+
+During non-nitrogen stress phase (\autoref{fig:PhenologWheatModule}),
+wheat could access to all available nitrogen. 
+\begin{equation}
+N_{s}(i)=N(i)\frac{1000}{\text{BD}(i)D_{s}(i)}\label{eq:NitrogenSupply}
+\end{equation}
+
+The values of $N_{s}(i)$ for each layer of root presented are summed
+to get a total potential nitrogen uptake (or crop N supply, $N_{s}$)
+and then each layer $N_{s}(i)$ is scaled by maximum total nitrogen
+uptake ($N_{s,\,max}$), which is defined by \texttt{total\_n\_uptake\_max}
+ with default value 0.6 g m\textsuperscript{-2}.
+\begin{equation}
+N_{s}'(i)=N_{s}(i)\frac{N_{s,\,max}}{N_{s}}
+\end{equation}
+where $N_{s}'(i)$ is the actual nitrogen uptake in the layer $i$.
+
+\subsection{Nitrogen demand}
+
+Total wheat nitrogen demand is the sum of the N demand in all parts
+(i.e. \texttt{Leaf}, \texttt{Stem}, and \texttt{Pod}). Wheat has a
+defined minimum ($C_{N,\,min}$), critical ($C_{N,\,crit}$) and maximum
+($C_{N,\,max}$) nitrogen concentration for all plant parts (\autoref{fig:wdNitrogenConcentration}).
+These concentration limits change with phenological stages (\autoref{fig:wdNitrogenConcentration}).
+And they are defined by parameters \texttt{x\_stage\_code}, \texttt{y\_n\_conc\_min\_leaf},
+\texttt{y\_n\_conc\_crit\_leaf}, \texttt{y\_n\_conc\_max\_leaf}, \texttt{y\_n\_conc\_min\_stem},
+\texttt{y\_n\_conc\_crit\_stem}, \texttt{y\_n\_conc\_max\_stem, y\_n\_conc\_min\_pod,
+y\_n\_conc\_crit\_pod, y\_n\_conc\_max\_pod} in wheat.xml and linearly
+interpolated by APSIM .
+
+Physiologically, minimum nitrogen concentration ($C_{N,\,min}$) corresponds
+to the structural N required for the plant structure, and which cannot
+be re-translocated. Critical nitrogen concentration ($C_{N,\,crit}$)
+corresponds to the minimum concentration of N that plant parts will
+attempt to maintain (it drives the \textquoteleft N demand\textquoteright{}
+of the part), and maximum nitrogen concentration ($C_{N,\,max}$)
+reflects to the capacity of the part to accumulate the extra available
+N (i.e. fulfilling more than its \textquoteleft demand\textquoteright )
+up to a this maximum threshold N.
+
+<<wdNitrogenConcentration,fig.height=6,fig.cap='Relationship between maximum, critical, minimum nitrogen concentration and growth stages for the different plant parts (Leaf, Stem and Pod). Parameters are defined by defined by parameters x\\_stage\\_code, y\\_n\\_conc\\_min\\_leaf, y\\_n\\_critonc\\_crit\\_leaf, y\\_n\\_conc\\_max\\_leaf, y\\_n\\_conc\\_min\\_stem, y\\_n\\_critonc\\_crit\\_stem, y\\_n\\_critonc\\_max\\_stem in wheat.xml.'>>=  
+p <- wdNitrogenConcentration()
+print(p$pod, position = c(0, 0, 1, 0.35), more = TRUE)
+print(p$stem, position = c(0, 0.31, 1, 0.68), more = TRUE)
+print(p$leaf, position = c(0, 0.65, 1, 1))
+@
+
+\subsubsection{Nitrogen demand of \texttt{Grain}}
+
+\texttt{Grain} nitrogen demand starts at anthesis and is calculated
+from grain number, thermal time and a potential grain nitrogen filling
+rate (g grain\textsuperscript{-1} $^{\circ}$Cd\textsuperscript{-1}).
+\begin{equation}
+N_{D,\;grain}=N_{g}\,R_{N,\,poten,}\,f_{N,\;grain}\,h_{grain}(T)\label{eq:NitrogenDemand}
+\end{equation}
+where $N_{g}$ is the grain number, $R_{N,\,poten,}$ is the potential
+nitrogen filling rate, which is defined by parameter \texttt{potential\_grain\_n\_filling\_rate}
+in wheat.xml with default value 0.000055 g grain\textsuperscript{-1}
+d\textsuperscript{-1}. $f_{N,\;grain}$ is the nitrogen factor of
+grain filling (\autoref{eq:NStressFilling}). $h_{grain}(T)$ is a
+function of daily mean temperature ($T$) to influence of grain filling
+(\autoref{fig:wdNitrogenTem}).
+
+<<wdNitrogenTem,fig.cap='Relationship between nitrogen demand of Grain and daily mean temperature.'>>=  
+p <- wdVisXY(wheat_xml, 
+		"x_temp_grain_n_fill", "y_rel_grain_n_fill",
+		xlab = expression(paste("Daily mean temperature", ~"("*degree*"C)")),
+		ylab = 'Temperature factor to nitrogen demand of grain')
+print(p)
+@
+
+\subsubsection{Nitrogen demand of other parts}
+
+Demand of nitrogen in each part (except Grain) attempts to maintain
+nitrogen at the critical (non-stressed) level. Nitrogen demand on
+any day is the sum of the demands from the pre-existing biomass of
+each part required to reach critical nitrogen content, plus the nitrogen
+required to maintain critical nitrogen concentrations in that day's
+produced biomass. For each plant part (\texttt{Leaf}, \texttt{Stem},
+and \texttt{Pod}) the nitrogen demand is given by:
+
+\begin{equation}
+N_{D,\;crit}=\frac{\Delta Q_{part}C_{N,\,crit}}{f_{w,\,photo}}+f_{n}(C_{N,\,crit}-C_{N,\,part})\qquad if\:C_{N,\,crit}>C_{N,\,part}\;\&\;Q_{part}>0
+\end{equation}
+
+\begin{equation}
+N_{D,\;max}=\frac{\Delta Q_{part}C_{N,\,max}}{f_{w,\,photo}}+f_{n}(C_{N,\,max}-C_{N,\,part})\qquad if\:C_{N,\,max}>C_{N,\,part}\;\&\;Q_{part}>0
+\end{equation}
+where $\Delta Q_{part}$ is the growth dry weight of parts, $Q_{part}$
+is the green (i.e. not senesced) dry weight of parts, $f_{w,\,photo}$
+is soil water stress of biomass accumulation (\autoref{eq:swstressphoto});
+$C_{N,\,part}$ is the nitrogen concentration of parts; $f_{n}$ is
+defined by parameter \texttt{n\_deficit\_uptake\_fraction} in wheat.xml
+with default value 0.0001. $C_{N,\,crit}$ and $C_{N,\,max}$ are
+the N concentration critic and maximal of the parts, respectively
+(\autoref{fig:wdNitrogenConcentration}).\textbf{ }$N_{D,\;crit}$
+and $N_{D,\;max}$ equal to 0, if $Q_{part}=0$.
+
+\subsection{\label{subsec:NitrogenPartitioningAndRetranslocation}Nitrogen uptake,
+partitioning and re-translocation}
+
+\subsubsection{Nitrogen concentrations in wheat parts}
+
+The N concentration in Leaf is calculated as follows:
+\begin{equation}
+C_{N,\,leaf}=N_{leaf}/Q_{leaf}
+\end{equation}
+
+
+\subsubsection{Nitrogen uptake}
+
+Daily total nitrogen uptake ($N_{u}$) is the lesser of N demand ($N_{d}$,
+\autoref{eq:NitrogenDemand}) and N supply $N_{s}$, \autoref{eq:NitrogenSupply}).
+
+\begin{equation}
+N_{u}=\text{min}(N_{d},\;N_{s})
+\end{equation}
+
+
+\subsubsection{Nitrogen translocation}
+
+Daily total nitrogen uptake is distributed to the plant parts in proportion
+to their individual demands. 
+
+\subsubsection{Nitrogen re-translocation }
+
+If there is insufficient nitrogen supplied from senescing material
+and soil nitrogen uptake, Grain nitrogen demand is met by re-translocating
+nitrogen from other plant parts. Nitrogen is available for re-translocation
+from un-senesced leaves and stems until they reach their defined minimum
+nitrogen concentration. No N re-translocation is attributed to other
+parts than \texttt{Grain}. 
+
+\subsection{Nitrogen stresses}
+
+\subsubsection{Phenology}
+
+Nitrogen stress on phenology (via $f_{N,\,pheno}$ in \autoref{eq:CumThermalTime})
+is determined by the difference between organ nitrogen concentration
+and organ minimum and critical nitrogen concentration.
+
+\begin{equation}
+f_{N,\,pheno}=h_{N,\,pheno}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\label{eq:NitrogenStress}
+\end{equation}
+where $C_{N}$ is the nitrogen concentration of \texttt{Stem} or \texttt{Leaf}
+parts; $h_{N,\,pheno}$ is multiple for nitrogen deficit effect on
+phenology which is specified by \texttt{N\_fact\_pheno} in the wheat.xml
+and default value is 100; $C_{N,\,crit}$ and $C_{N,\,min}$ are the
+N concentration critic and minimal of the parts, respectively (\autoref{fig:wdNitrogenConcentration});
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for \texttt{Leaf} (\autoref{fig:wbCO2CritLeaf}).
+
+The nitrogen stress on phenology is used in the calculation of the
+\textquoteleft adjusted\textquoteright{} thermal time (\autoref{eq:CumThermalTime}).
+However, In the current version of APSIM-Wheat module, the default
+parameters are applied for no nitrogen water stress for phenology. 
+
+\subsubsection{Biomass accumulation}
+
+Nitrogen stress on biomass accumulation (via $f_{N,\,photo}$ in \autoref{eq:StressFactor4Photosynthesis})
+is determined by the difference between leaf nitrogen concentration
+and leaf minimum and critical nitrogen concentration.
+
+\begin{equation}
+f_{N,\,photo}=h_{N,\,photo}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\label{eq:NStressPhoto}
+\end{equation}
+where $C_{N}$ is the nitrogen concentration of \texttt{Leaf} parts;
+$h_{N,\,photo}$ is multiplier for nitrogen deficit effect on photosynthesis
+which is specified by \texttt{N\_fact\_photo} in the wheat.xml and
+default value is 1.5; $C_{N,\,crit}$ and $C_{N,\,min}$ are the N
+concentration critic and minimal of the parts, respectively (\autoref{fig:wdNitrogenConcentration});
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for \texttt{Leaf} (\autoref{fig:wbCO2CritLeaf}).
+
+The nitrogen stress on biomass accumulation affects the radiation-limited
+biomass accumulation ($\Delta Q_{r}$, \autoref{eq:actualBiomassProduction}). 
+
+\subsubsection{Leaf appearance and expansion (i.e. leaf number and LAI)}
+
+Nitrogen stress on leaf appearance and expansion (via $f_{N,\,expan}$
+in \autoref{eq:LeafExpansionStress}) is determined by the difference
+between leaf nitrogen concentration and leaf minimum and critical
+nitrogen concentration.
+
+\begin{equation}
+f_{N,\,expan}=h_{N,\,expan}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\label{eq:NStressLeafExpansion}
+\end{equation}
+where $C_{N}$ is the nitrogen concentration of \texttt{Leaf} parts;
+$h_{N,\,expan}$ is multiplier for nitrogen deficit effect on expansion
+which is specified by \texttt{N\_fact\_expansion} in the wheat.xml
+(default value 1); $C_{N,\,crit}$ and $C_{N,\,min}$ are the N concentration
+critic and minimal of the parts, respectively (\autoref{fig:wdNitrogenConcentration});
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for \texttt{Leaf} (\autoref{fig:wbCO2CritLeaf}).
+
+The nitrogen stress on leaf appearance and expansion affects the potential
+leaf number ($N_{d,\,pot}$; \autoref{eq:PotentialNodeNumberDaily})
+and the stressed leaf area index ($\Delta\text{LAI}_{d,\,s}$, \autoref{eq:StressLeafArea}). 
+
+\subsubsection{Grain filling (biomass and nitrogen demand of grain)}
+
+Nitrogen stress on grain filling affects the biomass demand of \texttt{Grain}
+(via $f_{N,\,grain}$ in \autoref{eq:MealDemand}) and the N demand
+of \texttt{Grain} (\autoref{eq:NitrogenDemand}). 
+
+The nitrogen factor $f_{N,\,grain}$ (that impacts N demand of grain)
+is determined by the difference between organ nitrogen concentration
+and organ minimum and critical nitrogen concentration as follows:.
+
+\begin{equation}
+f_{N,\,grain}=\frac{h_{N,\ poten}}{h_{N,\ min}}h_{N,\,grain}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\qquad(0\leq f_{N,\,fill}\leq1)\label{eq:NStressFilling}
+\end{equation}
+where $h_{N,\ poten}$ is the potential rate of grain filling which
+is specified by \texttt{potential\_grain\_n\_filling\_rate} in wheat.xml
+and has a default value of 0.000055 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\ min}$ is the minimum rate of grain filling which is specified
+by \texttt{minimum\_grain\_n\_filling\_rate} in wheat.xml and has
+a default value of 0.000015 g grain\textsuperscript{-1} d\textsuperscript{-1};
+$h_{N,\,grain}$ is a multiplier for nitrogen deficit effect on grain,
+which is specified by \texttt{n\_fact\_grain} in wheat.xml and has
+a default value of 1; $C_{N}$ is the nitrogen concentration of \texttt{Stem}
+or \texttt{Leaf} parts; $C_{N,\,crit}$ and $C_{N,\,min}$ are critical
+and minimum nitrogen concentration, respectively, for \texttt{Stem}
+and \texttt{Leaf} parts. $C_{N,\,crit}$ and $C_{N,\,min}$ are functions
+of growth stage and nitrogen concentration which is defined by parameters
+\texttt{x\_stage\_code}, \texttt{y\_n\_conc\_min\_leaf}, \texttt{y\_n\_conc\_crit\_leaf},
+\texttt{y\_n\_conc\_min\_stem}, \texttt{y\_n\_conc\_crit\_stem} in
+wheat.xml and linearly interpolated by APSIM (\autoref{fig:wdNitrogenConcentration});
+and $f_{c,\,N}$ is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO\textsubscript{2} for \texttt{Leaf} (\autoref{fig:wbCO2CritLeaf}).
+
+\section{Phosphorus\label{subsec:Phosphorus-stress}}
+
+In the current version of APSIM-Wheat module, no phosphorus stress
+$f_{P,\,pheno}=1$ is applied in the soil system through parameter
+labile\_p in the source codes.
+
+\section{Temperature }
+
+As mentioned in previous sections, the temperature affects:
+\begin{itemize}
+\item crop phenology via the thermal time ($\Delta TT$; \autoref{eq:thermaltime})
+and crop vernalisation ($f_{V}$; \autoref{eq:VernalisationFactor}),
+and via crop emergence (\autoref{eq:Emergence}), 
+\item root depth growth ($f_{rt}$; \autoref{eq:RootGrowthTemperature};
+\autoref{fig:wdTempRootFactor}), 
+\item radiation-limited biomass accumulation ($\Delta Q_{r}$; \autoref{eq:BiomassProduction})
+via a stress factor ($f_{s}$), which depends on a temperature factor
+($f_{T,photo}$; \autoref{eq:TemStressPhoto}), 
+\item CO\textsubscript{2} effect on biomass accumulation via a temperature
+effect on the CO\textsubscript{2} compensation point $(C_{i}$; \autoref{eq:CO2Factor4Photosynthesis};
+\autoref{fig:wdCardonDioxideFactor}), 
+\item LAI senescence under minimum and maximum temperature ($\Delta LAI_{sen,\,frost}$,
+$\Delta LAI_{sen,\,heat}$; \autoref{eq:SensFrost} and \autoref{eq:SensHeat}),
+\item biomass demand of \texttt{Grain} ($D_{g}$) and the rate of grain
+filling (\autoref{eq:MealDemand}; \autoref{fig:PhenologWheatModule}), 
+\item N demand of \texttt{Grain} (\autoref{eq:NitrogenDemand}; \autoref{fig:wdNitrogenTem}), 
+\item VPD calculation (\autoref{eq:VPD}). 
+\end{itemize}
+
+\section{Light }
+
+Light photoperiod is calculated as detailed in 
+\autoref{sub:Photoperiod}. Photoperiod affects wheat phenology. 
+
+Light intensity and photoperiod also have an effect on diffuse light
+fraction (\autoref{par:Diffuse-factor}), so that it could impact
+the diffuse factor ($f_{d}$; \autoref{eq:BiomassProduction}; \autoref{sub:Radiation-limited-biomass})
+and reduce the radiation-limited biomass accumulation ($\Delta Q_{r}$;
+\autoref{sub:Radiation-limited-biomass}). However, in the current
+APSIM-Wheat, the diffuse factor equals to 1 (i.e. no impact of diffuse
+light on biomass production). 
+
+Light intensity affects
+\begin{itemize}
+\item radiation-limited biomass accumulation ($\Delta Q_{r}$; \autoref{sub:Radiation-limited-biomass})
+via the radiation interception ($I$; \autoref{eq:RadiationInterception}),
+which depends on the incoming radiation ($I_{0}$) and on a light-interception
+factor ($f_{h}$ ) based on the canopy width. However, this canopy
+factor has no impact in the current version of APSIM-Wheat ($f_{h}$
+= 1), 
+\item LAI senescence under low light condition ($\Delta LAI_{sen,\,light}$;
+\autoref{eq:SensLight}). 
+\end{itemize}
+
+\section{CO\protect\textsubscript{2}}
+
+As mentioned in previous sections, CO\textsubscript{2} concentration
+affects: 
+\begin{itemize}
+\item radiation-limited biomass accumulation ($\Delta Q_{r}$; \autoref{sub:Radiation-limited-biomass})
+via a CO\textsubscript{2} factor affecting the RUE ($f_{c}$; \autoref{eq:CO2Factor4Photosynthesis}), 
+\item transpiration efficiency ($TE$, \autoref{eq:TranspirationEfficiency})
+via another CO\textsubscript{2} factor ($f_{c,\,TE}$; \autoref{fig:wdCO2TE}), 
+\item N critic concentration of the leaves (\autoref{eq:NitrogenStress},
+\autoref{eq:NStressPhoto}, \autoref{eq:NStressLeafExpansion}, \autoref{eq:NStressFilling}
+and \autoref{fig:wbCO2CritLeaf}).
+\end{itemize}
+
+\section{Vapour pressure deficit (VPD) }
+
+The vapour pressure deficit (VPD) is calculated as presented in \autoref{eq:VPD}.
+VPD affects the transpiration efficiency (\autoref{eq:TranspirationEfficiency})
+and thus the crop water demand (\autoref{eq:soilWaterDemand}). 
+
+\bibliographystyle{elsart-harv}
+\bibliography{wd}
+
+\newpage{}
+
+\setcounter{figure}{0} 
+\renewcommand{\thefigure}{A.\arabic{figure}}  
+\setcounter{table}{0}  
+\renewcommand{\thetable}{A.\arabic{table}} 
+
+\begin{landscape}
+
+\appendix
+
+\section{Parameter list of wheat module}
+\begin{center}
+\begin{longtable}[c]{>{\raggedright}p{0.3\columnwidth}>{\raggedright}p{0.1\columnwidth}>{\raggedright}p{0.1\columnwidth}>{\raggedright}p{0.45\columnwidth}}
+\hline 
+Variables & Units & Default Value & Description\tabularnewline
+\hline 
+\endhead
+\multicolumn{4}{l}{\textbf{Phenology}}\tabularnewline
+\hypertarget{tt_<phase_name>}{tt\_<phase\_name>}, (\hypertarget{tt_emergence}{tt\_emergence}, \hypertarget{tt_end_of_juvenile}{tt\_end\_of\_juvenile},\hypertarget{tt_floral_initiation}{tt\_floral\_initiation}, \hypertarget{tt_flowering}{tt\_flowering}, \hypertarget{tt_start_grain_fill}{tt\_start\_grain\_fill}, \hypertarget{tt_end_grain_fill}{tt\_end\_grain\_fill}, \hypertarget{tt_maturity}{tt\_maturity}, \hypertarget{tt_end_crop}{tt\_end\_crop}, \hypertarget{tt_harvest_ripe}{tt\_harvest\_ripe}) & $^{\circ}\text{C}$ & \autoref{fig:PhenologWheatModule} & The thermal time target for all phases\tabularnewline
+\hypertarget{xtemp}{x\_temp}, \hypertarget{ytt}{y\_tt} & $^{\circ}\text{C}$, $^{\circ}\text{C}$d & \autoref{fig:wdThermalTime} & The function between cardinal temperature and effective thermal time.\tabularnewline
+\hypertarget{pesw_germ}{pesw\_germ} & mm mm$^{\text{-1}}$ & 0 & Plant extractable soil water in seedling layer inadequate for germination\tabularnewline
+\hypertarget{x_node_no_leaf}{x\_node\_no\_leaf}, \hypertarget{y_leaves_per_node}{y\_leaves\_per\_node} & node rank in main stem & \autoref{fig:wdTillerNumberByNode} & The function to define the potential new tiller number \tabularnewline
+\hypertarget{shoot_lag}{shoot\_lag} & $^{\circ}\text{C}$d & 40 & Time lag before linear coleoptile growth starts\tabularnewline
+\hypertarget{shoot_rate}{shoot\_rate} & $^{\circ}\text{C}$d mm$^{\text{-1}}$ & 1.5 & Growing deg day increase with depth for coleoptile\tabularnewline
+\hypertarget{fasw_emerg}{fasw\_emerg} & {[}{]} & 0.0 1.0 & Fraction of available soil water\tabularnewline
+\hypertarget{rel_emerg_rate}{rel\_emerg\_rate} & {[}{]} & 1.0 1.0 & Stress factor for thermal time calculation between germination and
+emergence\tabularnewline
+\hypertarget{tt_emergence}{tt\_emergence} & $^{\circ}\text{C}$d & 1 & The thermal time for seed emergence\tabularnewline
+\hypertarget{tt_end_of_juvenile}{tt\_end\_of\_juvenile} & $^{\circ}\text{C}$d & 400 & The potential period from end of juvenile stage to terminal spikelet
+stage%
+\begin{comment}
+May be from emergence
+\end{comment}
+\tabularnewline
+\hypertarget{twilight}{twilight} & $^{\circ}$ & -6.0 & Twilight is defined as the interval between sunrise or sunset and
+the time when the true\tabularnewline
+\hypertarget{photop_sens}{photop\_sens} & {[}{]} & 3 & Sensitivities to photoperiod\tabularnewline
+\hypertarget{vern_sens}{vern\_sens} & {[}{]} & 1.5 & Sensitivities to vernalisation\tabularnewline
+\hypertarget{N_fact_pheno}{N\_fact\_pheno} & {[}{]} & 100 & Multiplier for N deficit effect on phenology\tabularnewline
+ &  &  & \tabularnewline
+\textbf{Biomass production} &  &  & \tabularnewline
+\hypertarget{x_stage_rue}{x\_stage\_rue} & {[}{]} & 1 2 3 4 5 6 7 8 9 10 11 & Numeric code for phenological stages\tabularnewline
+\hypertarget{y_rue}{y\_rue} & g MJ$^{\text{-1}}$ & 0 0 1.24 1.24 1.24 1.24 1.24 1.24 0.00 0.00 0 & The radiation use efficiency for each phenological stage\tabularnewline
+\hypertarget{sen_rate_water}{sen\_rate\_water} & {[}{]} & 0.10 & slope in linear equation relating soil water stress during photosynthesis
+to leaf senescence rate\tabularnewline
+\hypertarget{sen_light_slope}{sen\_light\_slope} & {[}{]} & 0.002 & sensitivity of leaf area senescence to shading\tabularnewline
+\hypertarget{lai_sen_light}{lai\_sen\_light} & m$^{\text{2}}$ m$^{\text{-2}}$ & 7.0 & induced senescence occurs by shading\tabularnewline
+\hypertarget{x_sw_avail_ratio}{x\_sw\_avail\_ratio}, \hypertarget{y_swdef_pheno}{y\_swdef\_pheno} & {[}{]}, {[}{]} & \autoref{fig:wdSoilWaterStressPhenology} & The function between available soil water ratio and soil water stress
+of phenology.\tabularnewline
+\hypertarget{x_sw_avail_ratio_flowering}{x\_sw\_avail\_ratio\_flowering},
+\hypertarget{y_swdef_pheno_flowering}{y\_swdef\_pheno\_flowering} & {[}{]}, {[}{]} & \autoref{fig:wdSoilWaterStressPhenology} & The function between available soil water ratio and soil water stress
+of phenology for flowering phase.\tabularnewline
+\hypertarget{x_sw_avail_ratio_start_grain_fill}{x\_sw\_avail\_ratio\_start\_grain\_fill},
+\hypertarget{y_swdef_pheno_start_grain_fill}{y\_swdef\_pheno\_start\_grain\_fill} & {[}{]}, {[}{]} & \autoref{fig:wdSoilWaterStressPhenology} & The function between available soil water ratio and soil water stress
+of phenology for grain filling phase.\tabularnewline
+\hypertarget{x_stage_code}{x\_stage\_code}, \hypertarget{y_n_conc_min_leaf}{y\_n\_conc\_min\_leaf},
+\hypertarget{y_n_conc_crit_leaf}{y\_n\_conc\_crit\_leaf}
+
+\hypertarget{y_n_conc_min_stem}{y\_n\_conc\_min\_stem}, \hypertarget{y_n_conc_crit_stem}{y\_n\_conc\_crit\_stem} &  &  & The function between growth stage and minimum can critical nitrogen
+concentration.\tabularnewline
+\hypertarget{x_row_spacing}{x\_row\_spacing} & mm & 200 350 1000 & \tabularnewline
+\hypertarget{y_extinct_coef}{y\_extinct\_coef} & {[}{]} & 0.50 0.50 0.50 & \tabularnewline
+ &  &  & \tabularnewline
+\textbf{Leaf growth} &  &  & \tabularnewline
+\hypertarget{leaf_no_at_emerg}{leaf\_no\_at\_emerg} & {[}{]} & 2 & Leaf number at emergence\tabularnewline
+\hypertarget{initial_tpla}{initial\_tpla} & mm$^{\text{2}}$ plant$^{\text{-1}}$ & 200 & Initial leaf area per plant\tabularnewline
+\hypertarget{node_no_correction}{node\_no\_correction} & {[}{]} & 2 & The node number correction\tabularnewline
+\hypertarget{min_tpla}{min\_tpla} & mm$^{\text{2}}$ plant$^{\text{-1}}$ & 5.0 & Lower limit of total leaf area per plant\tabularnewline
+\hypertarget{x_lai}{x\_lai}, \hypertarget{y_sla_max}{y\_sla\_max} & mm$^{\text{2}}$ mm$^{-2}$, mm$^{\text{2}}$ g$^{\text{-1}}$ & \autoref{fig:wdSLA} & The function between leaf area index and specific leaf area.\tabularnewline
+\hypertarget{x_lai_ratio}{x\_lai\_ratio}, \hypertarget{y_leaf_no_frac}{y\_leaf\_no\_frac} & {[}{]}, {[}{]} & \autoref{fig:wdLAINodeNumber} & The function between fraction of leaf area index and fraction of node
+number.\tabularnewline
+\hypertarget{fr_lf_sen_rate}{fr\_lf\_sen\_rate} & {[}{]} & 0.035 & Fraction of total leaf number senescing per main stem node\tabularnewline
+\hypertarget{node_sen_rate}{node\_sen\_rate} & $^{\circ}\text{C}$d node$^{\text{-1}}$ & 60.0 & Rate of node senescence on main stem\tabularnewline
+\hypertarget{x_node_no}{x\_node\_no}, \hypertarget{y_leaf_size}{y\_leaf\_size} & node rank in main stem, mm$^{\text{2}}$ &  & The leaf size as a function of leaf number\tabularnewline
+\hypertarget{leaf_no_pot_option}{leaf\_no\_pot\_option} & {[}{]} & 2 & The option to calculate the potential leaf number. The option 2 is
+for wheat.\tabularnewline
+\hypertarget{x_sw_demand_ratio}{x\_sw\_demand\_ratio}, \hypertarget{y_swdef_leaf}{y\_swdef\_leaf} & {[}{]}, {[}{]} &  & The function between supply of soil water and water stress for leaf
+expansion.\tabularnewline
+\hypertarget{N_fact_expansion}{N\_fact\_expansion} & {[}{]}, & 1 & Multiplier for N deficit effect on leaf expansion\tabularnewline
+ &  &  & \tabularnewline
+\hline 
+\end{longtable}
+\par\end{center}
+
+\end{landscape}
+\end{document}

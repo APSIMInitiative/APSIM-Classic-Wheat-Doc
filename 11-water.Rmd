@@ -1,0 +1,359 @@
+# Crop Water Relations {#Crop-Water-Relations}
+
+
+
+## Crop water demand {#Crop-water-demand}
+
+
+Following \citet{sinclair1986waterand}, transpiration demand is modeled
+as a function of the current day's potential crop growth rate, estimated
+by the potential biomass accumulation associated with intercepted
+radiation ($\Delta Q_{r}$, see Equation \@ref(eq:BiomassProduction)),
+divided by the transpiration efficiency.
+
+\begin{equation}
+
+W_{d}=\frac{\Delta Q_{r}-R}{TE} (\#eq:soilWaterDemand)
+
+\end{equation}
+
+where $R$ is respiration rate and equal to zero in the current version
+of APSIM-Wheat, $TE$ is transpiration efficiency. $TE$ is related
+to the daylight averaged vapour pressure deficit ($VPD$, Equation \@ref(eq:VPD))
+and a multiple of CO\textsubscript{2} factor \citep{reyenga1999modelling}.
+
+\begin{equation}
+
+TE=f_{c,\,TE}\frac{f_{TE}}{VPD} (\#eq:TranspirationEfficiency)
+
+\end{equation}
+
+where $f_{c,\,TE}$ is the CO\textsubscript{2} factor for transpiration
+efficiency, which is a function of carbon dioxide concentration and
+is defined by parameters `x_co2_te_modifier` and `y_co2_te_modifier`
+in wheat.xml and linearly interpolated by APSIM (Fig. \@ref(fig:wdCO2TE)).
+$f_{c,\,TE}$ linearly increases from 1 to 1.37 when CO\textsubscript{2}
+concentration increases from 350 ppm to 700 ppm \citep{reyenga1999modelling}.
+$f_{TE}$ is the coefficient of transpiration efficiency, which values
+are defined in wheat.xml by parameters `transp_eff_cf` in
+wheat.xml for the different growth stages and are linearly interpolated
+by APSIM (Fig. \@ref(fig:wdCoefficientOfTE)). 
+
+
+```{r wdCO2TE,fig.cap='Relationship between factor of carbon dioxide for transpiration efficiency ($f_{c,\\, TE}$) and CO2 concentration.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_co2_te_modifier", "y_co2_te_modifier",
+		xlab = "Carbon dioxide concentration",
+		ylab = "Transpiration efficiency factor")
+print(p)
+
+```
+
+
+
+```{r wdCoefficientOfTE,fig.cap='Change in the coefficient of transpiration efficiency with growth stages.' }  
+
+p <- wdVisXY(wheat_xml, 
+		"stage_code", "transp_eff_cf",
+		xlab = "Stage",
+		ylab = "Coefficient of \ntranspiration efficiency")
+print(p)
+
+```
+
+
+$VPD$ is the vapour pressure deficit, which is estimated using the
+method proposed by \citet{tanner1983efficient} and only requires
+daily maximum and minimum temperatures.
+
+
+\begin{equation}
+
+VPD=f_{v}[6.1078\times\exp(\frac{17.269\times T_{max}}{237.3+T_{max}})-6.1078\times\exp(\frac{17.269\times T_{min}}{237.3+T_{min}})] (\#eq:VPD)
+
+\end{equation}
+
+In this method, it is assumed that the air is saturated at the minimum
+temperature. The saturated vapour pressure is calculated at both the
+maximum and minimum temperatures, and the default vapour pressure
+deficit for the day is taken as 75\% ($f_{v}$, defined by `svp_fract`
+in wheat.xml) of the difference between these two vapour pressures. 
+
+Crop water demand is capped to below a given multiple of potential
+ET (taken as Priestly-Taylor Eo from the water balance module) as
+specified by \hyperlink{eo_crop_factor_default}{eo_crop_factor_default}  
+in the wheat.xml file (default value 1.5). This limits water use to
+reasonable values on days with high VPD or in more arid environments.
+
+
+## Potential and actual extractable soil water
+
+
+Potential and actual extractable soil water is the sum of root water
+contents available to the crop from each profile layer occupied by
+roots. If roots are only partially through a layer available soil
+water is scaled to the portion that contains roots. Potential extractable
+soil water ($\text{ESW}_{p}$) is the difference between drained
+upper limit soil water content (DUL) and lower limit of plant-extractable
+soil water (LL) for each soil layer. The actual extractable soil water
+($esw_{a}$) is the difference between the soil water content (SW)
+and lower limit of plant-extractable soil water (LL) for each soil
+layer.
+
+\begin{equation}
+
+\begin{array}{c}
+\text{ESW}_{p}(i)=\text{DUL}(i)-\text{LL}(i)\\
+\text{ESW}a(i)=\text{SW}(i)-\text{LL}(i)\\
+\text{ESW}_{p}=\sum_{i=1}^{I}[\text{DUL}(i)-\text{LL}(i)]\\
+\text{ESW}_{a}=\sum_{i=1}^{I}[\text{SW}(i)-\text{LL}(i)]
+\end{array} (\#eq:SoilWaterESW)
+
+\end{equation}
+
+where $i$ indicates soil layers (where roots are present), and $I$
+indicates the deepest soil water of root presented. Similar variables
+are calculated for the entire soil profile (i.e. roots may not occupy
+all the layers). 
+
+\begin{equation}
+
+\begin{array}{c}
+\text{PAWC}=\sum_{i}^{N_{s}}[\text{DUL}(i)-\text{LL}(i)]\\
+\text{ESW}=\sum_{i}^{N_{s}}[\text{SW}(i)-\text{LL}(i)]
+\end{array}
+
+\end{equation}
+
+where $i$ indicates soil layers, $N_{s}$ indicates the number of
+soil layers, and PAWC is the plant available water capacity. 
+
+
+## Crop water supply, i.e. potential soil water uptake
+
+
+The APSIM-Wheat module can be coupled to either the SWIM2 module (see
+module documentation) or the SOILWAT2 module (default). When the APSIM-Wheat
+module is coupled to APSIM-SOILWAT2, potential soil water uptake (or
+water supply, $W_{s}$) is calculated using the approach first advocated
+by Monteith (1986). Crop water supply is considered as the sum of
+potential root water uptake from each profile layer occupied by root.
+If roots are only partially through a layer available soil water is
+scaled to the portion that contains roots. The potential rate of extraction
+in a layer is calculated using a rate constant (KL) as actual extractable
+soil water. The KL defines the fraction of available water able to
+be extracted per day. The KL factor is empirically derived, incorporating
+both plant and soil factors which limit rate of water uptake. Root
+water extraction values (KL) must be defined for each combination
+of crop species and soil type.
+
+\begin{equation}
+
+\begin{array}{c}
+\begin{array}{cc}
+W_{s}(i) & =\text{KL}(i)[\text{SW}(i)-\text{LL}(i)]\qquad\qquad if\,i\leq I-1\\
+ & =\frac{D_{r}(i)}{D_{s}(i)}\text{KL}(i)[\text{SW}(i)-\text{LL}(i)]\qquad\qquad if\,i=I
+\end{array}\\
+W_{s}=\sum_{i=1}^{I}W_{s}(i)
+\end{array} (\#eq:WaterSupply)
+
+\end{equation}
+
+where $i$ is the soil layer, $I$ is the deepest soil layer where
+roots are present, $W_{s}(i)$ is the water supply available from
+layer $i$, $W_{s}$ is the crop water supply, $\text{SW}(i)$ is
+the soil water content in layer $i$, $\text{LL}(i)$ is the lower
+limit of plant-extractable soil water in layer $i$, $\text{KL}(i)$
+is the root water extraction values in layer $i$, $D_{r}(i)$ is
+the root depth within the soil layer ($i$) where roots are present,
+and $D_{s}(i)$ is the thickness of this layer $i$. 
+
+
+## Actual soil water uptake
+
+
+The actual rate of water uptake is the lesser of the potential soil
+water supply ($W_{s}$, Equation \@ref(eq:WaterSupply)) and the soil water
+demand ($W_{d}$, Equation \@ref(eq:soilWaterDemand)), which is determining
+whether biomass production is limited by radiation or water uptake
+(Equation \@ref(eq:actualBiomassProduction))
+
+
+\begin{equation}
+
+W_{u}=\min(W_{d},\,W_{s}) (\#eq:WaterUpdate)
+
+\end{equation}
+
+If the potential soil water supply (accessible by the roots) exceeds
+the crop water demand, then the actual soil water uptake ($W_{u}$)
+is removed from the occupied layers in proportion to the values of
+potential root water uptake in each layer. If the computed soil water
+supply from the profile is less than the demand then, and the actual
+root water uptake from a layer is equal to the computed potential
+uptake. If there are not soil water supply and demand, soil water
+update equals to zero.
+
+\begin{equation}
+
+\begin{array}{c}
+\Delta W_{s}(i)=-W_{s}(i)\times\frac{W_{d}}{W_{s}}\qquad if\;W_{s}<W_{d}\\
+\Delta W_{s}(i)=-W_{s}(i)\qquad if\;W_{s}>W_{d}\\
+\Delta W_{s}(i)=0\qquad if\;W_{s}=W_{d}=0
+\end{array}
+
+\end{equation}
+
+where $\Delta W_{s}(i)$ is the daily change in soil water content
+at layer $i$ (where roots are present), and $W_{s}(i)$ is the water
+supply available from layer $i$ (Equation \@ref(eq:WaterSupply)) .
+
+
+## Soil water stresses affecting plant growth
+
+
+Soil water deficit factors are calculated to simulate the effects
+of water stress on different plant growth-and-development processes.
+Three water deficit factors are calculated which correspond to four
+plant processes, each having different sensitivity to water stress
+i.e. photosynthesis, leaf expansion, and phenology. 
+
+Each of these factors is capped between 0 and 1, where the value of
+0 corresponds to a complete stress, while 1 corresponds to no stress.
+
+Leaf expansion is considered more sensitive to stress than photosynthesis,
+while soil water has no impact on crop phenology in the current APSIM-Wheat
+version. 
+
+
+### Phenology
+
+
+Soil water stress of phenology is determined by the soil water deficiency. 
+
+
+\begin{equation}
+
+f_{W,\,pheno}=h_{w,\,pheno}(\frac{esw_{a}}{esw_{p}}) (\#eq:SoilWaterStress)
+
+\end{equation}
+
+where $esw_{a}$ is the actual extractable soil water in root layers,
+$esw_{p}$ is the potential extractable soil water in root layers.
+$h_{w,\,pheno}$ is a function of soil water available ratio and soil
+water stress, which is defined by parameters `x_sw_avail_ratio`
+and `y_swdef_pheno` (default value 1) in wheat.xml and linearly
+interpolated by APSIM. In the current version of APSIM-Wheat module,
+no soil water stress for phenology is applied (Fig. \@ref(fig:wdSoilWaterStressPhenology)).
+The soil water stress of phenology for flowering (`x_sw_avail_ratio_flowering`
+and `y_swdef_pheno_flowering`) and grain filling (`x_sw_avail_ratio_start_grain_fill`
+and `y_swdef_pheno_start_grain_fill`) phases are calculated
+in the source code, but don't have influence on the phenology of wheat
+in the current APSIM-Wheat version (default value of 1).
+
+
+```{r wdSoilWaterStressPhenology,fig.cap='Relationship between soil water stress factor affecting phenology ($f_{W,\\, pheno}$) and the ratio of available soil water ($\\frac{esw_{a}}{esw_{p}}$).' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_sw_avail_ratio", "y_swdef_pheno ",
+		xlab = "Ratio of available soil water",
+		ylab = "Soil water stress \nof phenology")
+print(p)
+
+```
+
+
+
+### Photosynthesis
+
+
+Soil water stress of biomass accumulation ($f_{w,\,photo}$) is calculated
+as follows.
+
+\begin{equation}
+
+f_{w,\,photo}=\frac{W_{u}}{W_{d}} (\#eq:swstressphoto)
+
+\end{equation}
+
+where $W_{u}$ is the total daily water uptake from root system (Equation \@ref(eq:WaterUpdate)),
+$W_{d}$ is the soil water demand of `Leaf` and `Head`
+parts (Equation \@ref(eq:soilWaterDemand)). 
+
+Finally, the potential biomass production (radiation-limited$\Delta Q$)
+can limit by water uptake ($f_{w,\,photo}<1$, i.e. when $W_{u}<W_{d}$),
+or not (when $f_{w,\,photo}=1$, i.e. when $W_{u}=W_{d}$)
+
+
+\begin{equation}
+
+\Delta Q_{w}=\Delta Q_{r}f_{w,\,photo}=\Delta Q_{r}\frac{W_{u}}{W_{d}} (\#eq:WaterStressBiomassProduction)
+
+\end{equation}
+
+
+$f_{w,photo}$ also affect the senescence of the leaves.
+
+
+### Leaf expansion
+
+
+Soil water stress of leaf expansion is determined by the deficit of
+soil water. 
+
+
+\begin{equation}
+
+f_{W,\,expan}=h_{w,\,expan}(\frac{W_{u}}{W_{d}}) (\#eq:WaterStressLeafExpansion)
+
+\end{equation}
+
+where $W_{u}$ is the crop water uptake (Equation \@ref(eq:WaterUpdate)),
+$W_{d}$ is the crop water demand (Equation \@ref(eq:soilWaterDemand)).
+$h_{w,\,expan}$ is a function of soil water content and stress, and
+is defined by parameters `x_sw_demand_ratio` and `y_swdef_leaf`
+in the wheat.xml, which is linearly interpolated by APSIM (Fig. \@ref(fig:wdWaterStress4LeafExpansion)). 
+
+
+```{r wdWaterStress4LeafExpansion,fig.cap='Relationship between the soil water stress factor affecting expansion ($f_{W,\\, expan}$) and supply:demand ratio ($\\frac{W_{e}}{W_{d}}$).' }  
+
+p <- wdVisXY(wheat_xml, 
+		"x_sw_demand_ratio", "y_swdef_leaf",
+		xlab = "Soil water supply:demand ratio",
+		ylab = "Soil water stress of expansion")
+print(p)
+
+```
+
+
+
+## KL factor
+
+
+APSIM 7.5 introduces a modifying factor on KL (rate of maximum daily
+water uptake per day) where there is an excess of chloride concentration
+(Cl), exchangeable sodium percentage (ESP), or electrical conductivity
+(EC) properties in the soil \citep{hochman2007simulating}. The KL
+modifier is optional and triggered by setting the ModifyKL parameter
+to `yes`.
+
+When the KL modifier is activated, KL values are modified for each
+layer, by factors (concerning Cl, ESP, EC; Fig. \@ref(fig:wdKLFactoring))
+applied to default KL values. The modifiers are calculated using one
+of the limiting factors in order of preference (Cl, ESP, EC), i.e.
+KL is modified only if there are no soil parameters for Cl. The parameters
+in the wheat.xml that control this mechanism are ClA, CLB, ESPA, ESPB,
+ECA, ECB (slope and intercept of linear relationship for Cl, ESP and
+EC).
+
+
+```{r wdKLFactoring,fig.height=6,fig.cap='The KL factor in response to chloride concentration (Cl mg kg$^{-1}$, Exchangeable sodium percentage (ESP, \\%) and soil electrical conductivity (EC, dS m$^{-1}$.' }  
+
+p <- wdKLFactoring(wheat_xml)
+print(p)
+
+```
+
+
+
