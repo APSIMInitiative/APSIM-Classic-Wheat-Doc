@@ -2,14 +2,13 @@
 # CO2
 
 
-As mentioned in previous sections, CO\textsubscript{2} concentration
+As mentioned in previous sections, CO2 concentration
 affects: 
-\begin{itemize}
-\item radiation-limited biomass accumulation ($\Delta Q_{r}$;  Section @ref(Radiation-limited-biomass))
+
+* radiation-limited biomass accumulation ($\Delta Q_{r}$;  Section @ref(Radiation-limited-biomass))
 via a CO\textsubscript{2} factor affecting the RUE ($f_{c}$; Equation \@ref(eq:CO2Factor4Photosynthesis)), 
-\item transpiration efficiency ($TE$, Equation \@ref(eq:TranspirationEfficiency))
+* transpiration efficiency ($TE$, Equation \@ref(eq:TranspirationEfficiency))
 via another CO\textsubscript{2} factor ($f_{c,\,TE}$; Fig. \@ref(fig:wdCO2TE)), 
-\item N critic concentration of the leaves (Equation \@ref(eq:NitrogenStress),
+* N critic concentration of the leaves (Equation \@ref(eq:NitrogenStress),
 Equation \@ref(eq:NStressPhoto), Equation \@ref(eq:NStressLeafExpansion), Equation \@ref(eq:NStressFilling)
 and Fig. \@ref(fig:wbCO2CritLeaf)).
-\end{itemize}
