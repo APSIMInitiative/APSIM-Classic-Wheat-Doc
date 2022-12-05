@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>11 Crop Water Relations | APSIM Classic Wheat Documentation</title>
+  <meta name="description" content="This book is the documentation for APSIM Classic Wheat model." />
+  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="11 Crop Water Relations | APSIM Classic Wheat Documentation" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="11 Crop Water Relations | APSIM Classic Wheat Documentation" />
+  
+  <meta name="twitter:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+<meta name="author" content="Bangyou Zheng" />
+
+
+<meta name="date" content="2022-12-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="senescence.html"/>
+<link rel="next" href="nitrogen.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">APSIM Wheat Doc</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="scope.html"><a href="scope.html"><i class="fa fa-check"></i><b>1</b> Scope of the APSIM-Wheat module</a></li>
+<li class="chapter" data-level="2" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>2</b> APSIM-Wheat history</a></li>
+<li class="chapter" data-level="3" data-path="phenology.html"><a href="phenology.html"><i class="fa fa-check"></i><b>3</b> Phenology</a><ul>
+<li class="chapter" data-level="3.1" data-path="phenology.html"><a href="phenology.html#thermal-time-calculation"><i class="fa fa-check"></i><b>3.1</b> Thermal time calculation</a></li>
+<li class="chapter" data-level="3.2" data-path="phenology.html"><a href="phenology.html#sowing-germination-phase"><i class="fa fa-check"></i><b>3.2</b> Sowing-germination phase</a></li>
+<li class="chapter" data-level="3.3" data-path="phenology.html"><a href="phenology.html#germination-emergence-phase"><i class="fa fa-check"></i><b>3.3</b> Germination-emergence phase</a></li>
+<li class="chapter" data-level="3.4" data-path="phenology.html"><a href="phenology.html#photoperiod-impact-on-phenology"><i class="fa fa-check"></i><b>3.4</b> Photoperiod impact on phenology</a></li>
+<li class="chapter" data-level="3.5" data-path="phenology.html"><a href="phenology.html#vernalisation-impact-on-phenology"><i class="fa fa-check"></i><b>3.5</b> Vernalisation impact on phenology</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html"><i class="fa fa-check"></i><b>4</b> Biomass accumulation (Photosynthesis)</a><ul>
+<li class="chapter" data-level="4.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#potential-biomass-accumulation-from-radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1</b> Potential biomass accumulation from radiation use efficiency</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-interception"><i class="fa fa-check"></i><b>4.1.1</b> Radiation interception</a></li>
+<li class="chapter" data-level="4.1.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1.2</b> Radiation use efficiency</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#actual-daily-biomass-accumulation"><i class="fa fa-check"></i><b>4.2</b> Actual daily biomass accumulation</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html"><i class="fa fa-check"></i><b>5</b> Biomass partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="5.1" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning"><i class="fa fa-check"></i><b>5.1</b> Biomass partitioning</a></li>
+<li class="chapter" data-level="5.2" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-root"><i class="fa fa-check"></i><b>5.2</b> Biomass partitioning to <code>Root</code></a></li>
+<li class="chapter" data-level="5.3" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-head-pod-textttmeal"><i class="fa fa-check"></i><b>5.3</b> Biomass partitioning to <code>Head</code> (<code>Pod</code>, \texttt{Meal</a></li>
+<li class="chapter" data-level="5.4" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-leaf"><i class="fa fa-check"></i><b>5.4</b> Biomass partitioning to <code>Leaf</code></a></li>
+<li class="chapter" data-level="5.5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-stem"><i class="fa fa-check"></i><b>5.5</b> Biomass partitioning to <code>Stem</code></a></li>
+<li class="chapter" data-level="5.6" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#re-translocation"><i class="fa fa-check"></i><b>5.6</b> Re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="head-development.html"><a href="head-development.html"><i class="fa fa-check"></i><b>6</b> Head development</a><ul>
+<li class="chapter" data-level="6.1" data-path="head-development.html"><a href="head-development.html#grain-number"><i class="fa fa-check"></i><b>6.1</b> Grain number</a></li>
+<li class="chapter" data-level="6.2" data-path="head-development.html"><a href="head-development.html#grain-meal-demand"><i class="fa fa-check"></i><b>6.2</b> <code>Grain</code> (<code>Meal</code>) demand</a></li>
+<li class="chapter" data-level="6.3" data-path="head-development.html"><a href="head-development.html#pod-demand"><i class="fa fa-check"></i><b>6.3</b> <code>Pod</code> demand</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html"><i class="fa fa-check"></i><b>7</b> Leaf and node appearance and crop leaf area</a><ul>
+<li class="chapter" data-level="7.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#node-number"><i class="fa fa-check"></i><b>7.1</b> Node number</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-appearance-rate"><i class="fa fa-check"></i><b>7.1.1</b> Potential node appearance rate</a></li>
+<li class="chapter" data-level="7.1.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-number-daily-increase"><i class="fa fa-check"></i><b>7.1.2</b> Potential node number (daily increase)</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#leaf-number"><i class="fa fa-check"></i><b>7.2</b> Leaf number</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.1</b> Potential leaf number (daily increase)</a></li>
+<li class="chapter" data-level="7.2.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#actual-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.2</b> Actual leaf number (daily increase)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html"><i class="fa fa-check"></i><b>8</b> Leaf area expansion</a><ul>
+<li class="chapter" data-level="8.1" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#actual-leaf-area-daily-increase"><i class="fa fa-check"></i><b>8.1</b> Actual leaf area (daily increase)</a></li>
+<li class="chapter" data-level="8.2" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#stressed-leaf-area"><i class="fa fa-check"></i><b>8.2</b> Stressed leaf area</a></li>
+<li class="chapter" data-level="8.3" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#carbon-limited-leaf-area"><i class="fa fa-check"></i><b>8.3</b> Carbon-limited leaf area</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html"><i class="fa fa-check"></i><b>9</b> Root growth and distribution</a><ul>
+<li class="chapter" data-level="9.1" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-depth-growth"><i class="fa fa-check"></i><b>9.1</b> Root depth growth</a></li>
+<li class="chapter" data-level="9.2" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-length"><i class="fa fa-check"></i><b>9.2</b> Root length</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="senescence.html"><a href="senescence.html"><i class="fa fa-check"></i><b>10</b> Senescence</a><ul>
+<li class="chapter" data-level="10.1" data-path="senescence.html"><a href="senescence.html#leaf-number-senescence"><i class="fa fa-check"></i><b>10.1</b> Leaf number senescence</a></li>
+<li class="chapter" data-level="10.2" data-path="senescence.html"><a href="senescence.html#leaf-area-senescence"><i class="fa fa-check"></i><b>10.2</b> Leaf area senescence</a></li>
+<li class="chapter" data-level="10.3" data-path="senescence.html"><a href="senescence.html#biomass-senescence"><i class="fa fa-check"></i><b>10.3</b> Biomass senescence</a></li>
+<li class="chapter" data-level="10.4" data-path="senescence.html"><a href="senescence.html#root-senescence"><i class="fa fa-check"></i><b>10.4</b> Root senescence</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html"><i class="fa fa-check"></i><b>11</b> Crop Water Relations</a><ul>
+<li class="chapter" data-level="11.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#Crop-water-demand"><i class="fa fa-check"></i><b>11.1</b> Crop water demand</a></li>
+<li class="chapter" data-level="11.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#potential-and-actual-extractable-soil-water"><i class="fa fa-check"></i><b>11.2</b> Potential and actual extractable soil water</a></li>
+<li class="chapter" data-level="11.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#crop-water-supply-i.e.-potential-soil-water-uptake"><i class="fa fa-check"></i><b>11.3</b> Crop water supply, i.e. potential soil water uptake</a></li>
+<li class="chapter" data-level="11.4" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#actual-soil-water-uptake"><i class="fa fa-check"></i><b>11.4</b> Actual soil water uptake</a></li>
+<li class="chapter" data-level="11.5" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#soil-water-stresses-affecting-plant-growth"><i class="fa fa-check"></i><b>11.5</b> Soil water stresses affecting plant growth</a><ul>
+<li class="chapter" data-level="11.5.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#phenology-1"><i class="fa fa-check"></i><b>11.5.1</b> Phenology</a></li>
+<li class="chapter" data-level="11.5.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#photosynthesis"><i class="fa fa-check"></i><b>11.5.2</b> Photosynthesis</a></li>
+<li class="chapter" data-level="11.5.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#leaf-expansion"><i class="fa fa-check"></i><b>11.5.3</b> Leaf expansion</a></li>
+</ul></li>
+<li class="chapter" data-level="11.6" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#kl-factor"><i class="fa fa-check"></i><b>11.6</b> KL factor</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="nitrogen.html"><a href="nitrogen.html"><i class="fa fa-check"></i><b>12</b> Nitrogen</a><ul>
+<li class="chapter" data-level="12.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-supply"><i class="fa fa-check"></i><b>12.1</b> Nitrogen supply</a></li>
+<li class="chapter" data-level="12.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand"><i class="fa fa-check"></i><b>12.2</b> Nitrogen demand</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.2.1</b> Nitrogen demand of <code>Grain</code></a></li>
+<li class="chapter" data-level="12.2.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-other-parts"><i class="fa fa-check"></i><b>12.2.2</b> Nitrogen demand of other parts</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake-partitioning-and-re-translocation"><i class="fa fa-check"></i><b>12.3</b> Nitrogen uptake, partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="12.3.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-concentrations-in-wheat-parts"><i class="fa fa-check"></i><b>12.3.1</b> Nitrogen concentrations in wheat parts</a></li>
+<li class="chapter" data-level="12.3.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake"><i class="fa fa-check"></i><b>12.3.2</b> Nitrogen uptake</a></li>
+<li class="chapter" data-level="12.3.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-translocation"><i class="fa fa-check"></i><b>12.3.3</b> Nitrogen translocation</a></li>
+<li class="chapter" data-level="12.3.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-re-translocation"><i class="fa fa-check"></i><b>12.3.4</b> Nitrogen re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-stresses"><i class="fa fa-check"></i><b>12.4</b> Nitrogen stresses</a><ul>
+<li class="chapter" data-level="12.4.1" data-path="nitrogen.html"><a href="nitrogen.html#phenology-2"><i class="fa fa-check"></i><b>12.4.1</b> Phenology</a></li>
+<li class="chapter" data-level="12.4.2" data-path="nitrogen.html"><a href="nitrogen.html#biomass-accumulation"><i class="fa fa-check"></i><b>12.4.2</b> Biomass accumulation</a></li>
+<li class="chapter" data-level="12.4.3" data-path="nitrogen.html"><a href="nitrogen.html#leaf-appearance-and-expansion-i.e.-leaf-number-and-lai"><i class="fa fa-check"></i><b>12.4.3</b> Leaf appearance and expansion (i.e. leaf number and LAI)</a></li>
+<li class="chapter" data-level="12.4.4" data-path="nitrogen.html"><a href="nitrogen.html#grain-filling-biomass-and-nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.4.4</b> Grain filling (biomass and nitrogen demand of grain)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="Phosphorus-stress.html"><a href="Phosphorus-stress.html"><i class="fa fa-check"></i><b>13</b> Phosphorus</a></li>
+<li class="chapter" data-level="14" data-path="temperature.html"><a href="temperature.html"><i class="fa fa-check"></i><b>14</b> Temperature</a></li>
+<li class="chapter" data-level="15" data-path="light.html"><a href="light.html"><i class="fa fa-check"></i><b>15</b> Light</a></li>
+<li class="chapter" data-level="16" data-path="co2.html"><a href="co2.html"><i class="fa fa-check"></i><b>16</b> CO2</a></li>
+<li class="chapter" data-level="17" data-path="vapour-pressure-deficit-vpd.html"><a href="vapour-pressure-deficit-vpd.html"><i class="fa fa-check"></i><b>17</b> Vapour pressure deficit (VPD)</a></li>
+<li class="chapter" data-level="18" data-path="reference.html"><a href="reference.html"><i class="fa fa-check"></i><b>18</b> Reference</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/byzheng/apsim-classic-wheat-doc" target="blank">Github</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">APSIM Classic Wheat Documentation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="Crop-Water-Relations" class="section level1 hasAnchor">
+<h1><span class="header-section-number">11</span> Crop Water Relations<a href="Crop-Water-Relations.html#Crop-Water-Relations" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="Crop-water-demand" class="section level2 hasAnchor">
+<h2><span class="header-section-number">11.1</span> Crop water demand<a href="Crop-Water-Relations.html#Crop-water-demand" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Following , transpiration demand is modeled
+as a function of the current day’s potential crop growth rate, estimated
+by the potential biomass accumulation associated with intercepted
+radiation (<span class="math inline">\(\Delta Q_{r}\)</span>, see Equation <a href="biomass-accumulation-photosynthesis.html#eq:BiomassProduction">(4.1)</a>),
+divided by the transpiration efficiency.</p>
+<p><span class="math display" id="eq:soilWaterDemand">\[\begin{equation}
+
+W_{d}=\frac{\Delta Q_{r}-R}{TE} \tag{11.1}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(R\)</span> is respiration rate and equal to zero in the current version
+of APSIM-Wheat, <span class="math inline">\(TE\)</span> is transpiration efficiency. <span class="math inline">\(TE\)</span> is related
+to the daylight averaged vapour pressure deficit (<span class="math inline">\(VPD\)</span>, Equation <a href="Crop-Water-Relations.html#eq:VPD">(11.3)</a>)
+and a multiple of CO factor .</p>
+<p><span class="math display" id="eq:TranspirationEfficiency">\[\begin{equation}
+
+TE=f_{c,\,TE}\frac{f_{TE}}{VPD} \tag{11.2}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(f_{c,\,TE}\)</span> is the CO factor for transpiration
+efficiency, which is a function of carbon dioxide concentration and
+is defined by parameters <code>x_co2_te_modifier</code> and <code>y_co2_te_modifier</code>
+in wheat.xml and linearly interpolated by APSIM (Fig. <a href="Crop-Water-Relations.html#fig:wdCO2TE">11.1</a>).
+<span class="math inline">\(f_{c,\,TE}\)</span> linearly increases from 1 to 1.37 when CO
+concentration increases from 350 ppm to 700 ppm .
+<span class="math inline">\(f_{TE}\)</span> is the coefficient of transpiration efficiency, which values
+are defined in wheat.xml by parameters <code>transp_eff_cf</code> in
+wheat.xml for the different growth stages and are linearly interpolated
+by APSIM (Fig. <a href="Crop-Water-Relations.html#fig:wdCoefficientOfTE">11.2</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdCO2TE"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdCO2TE-1.png" alt="Relationship between factor of carbon dioxide for transpiration efficiency ($f_{c,\, TE}$) and CO2 concentration." width="100%" />
+<p class="caption">
+Figure 11.1: Relationship between factor of carbon dioxide for transpiration efficiency (<span class="math inline">\(f_{c,\, TE}\)</span>) and CO2 concentration.
+</p>
+</div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdCoefficientOfTE"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdCoefficientOfTE-1.png" alt="Change in the coefficient of transpiration efficiency with growth stages." width="100%" />
+<p class="caption">
+Figure 11.2: Change in the coefficient of transpiration efficiency with growth stages.
+</p>
+</div>
+<p><span class="math inline">\(VPD\)</span> is the vapour pressure deficit, which is estimated using the
+method proposed by  and only requires
+daily maximum and minimum temperatures.</p>
+<p><span class="math display" id="eq:VPD">\[\begin{equation}
+
+VPD=f_{v}[6.1078\times\exp(\frac{17.269\times T_{max}}{237.3+T_{max}})-6.1078\times\exp(\frac{17.269\times T_{min}}{237.3+T_{min}})] \tag{11.3}
+
+\end{equation}\]</span></p>
+<p>In this method, it is assumed that the air is saturated at the minimum
+temperature. The saturated vapour pressure is calculated at both the
+maximum and minimum temperatures, and the default vapour pressure
+deficit for the day is taken as 75% (<span class="math inline">\(f_{v}\)</span>, defined by <code>svp_fract</code>
+in wheat.xml) of the difference between these two vapour pressures.</p>
+<p>Crop water demand is capped to below a given multiple of potential
+ET (taken as Priestly-Taylor Eo from the water balance module) as
+specified by \hyperlink{eo_crop_factor_default}{eo_crop_factor_default}<br />
+in the wheat.xml file (default value 1.5). This limits water use to
+reasonable values on days with high VPD or in more arid environments.</p>
+</div>
+<div id="potential-and-actual-extractable-soil-water" class="section level2 hasAnchor">
+<h2><span class="header-section-number">11.2</span> Potential and actual extractable soil water<a href="Crop-Water-Relations.html#potential-and-actual-extractable-soil-water" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Potential and actual extractable soil water is the sum of root water
+contents available to the crop from each profile layer occupied by
+roots. If roots are only partially through a layer available soil
+water is scaled to the portion that contains roots. Potential extractable
+soil water (<span class="math inline">\(\text{ESW}_{p}\)</span>) is the difference between drained
+upper limit soil water content (DUL) and lower limit of plant-extractable
+soil water (LL) for each soil layer. The actual extractable soil water
+(<span class="math inline">\(esw_{a}\)</span>) is the difference between the soil water content (SW)
+and lower limit of plant-extractable soil water (LL) for each soil
+layer.</p>
+<p><span class="math display" id="eq:SoilWaterESW">\[\begin{equation}
+
+\begin{array}{c}
+\text{ESW}_{p}(i)=\text{DUL}(i)-\text{LL}(i)\\
+\text{ESW}a(i)=\text{SW}(i)-\text{LL}(i)\\
+\text{ESW}_{p}=\sum_{i=1}^{I}[\text{DUL}(i)-\text{LL}(i)]\\
+\text{ESW}_{a}=\sum_{i=1}^{I}[\text{SW}(i)-\text{LL}(i)]
+\end{array} \tag{11.4}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(i\)</span> indicates soil layers (where roots are present), and <span class="math inline">\(I\)</span>
+indicates the deepest soil water of root presented. Similar variables
+are calculated for the entire soil profile (i.e. roots may not occupy
+all the layers).</p>
+<p><span class="math display">\[\begin{equation}
+
+\begin{array}{c}
+\text{PAWC}=\sum_{i}^{N_{s}}[\text{DUL}(i)-\text{LL}(i)]\\
+\text{ESW}=\sum_{i}^{N_{s}}[\text{SW}(i)-\text{LL}(i)]
+\end{array}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(i\)</span> indicates soil layers, <span class="math inline">\(N_{s}\)</span> indicates the number of
+soil layers, and PAWC is the plant available water capacity.</p>
+</div>
+<div id="crop-water-supply-i.e.-potential-soil-water-uptake" class="section level2 hasAnchor">
+<h2><span class="header-section-number">11.3</span> Crop water supply, i.e. potential soil water uptake<a href="Crop-Water-Relations.html#crop-water-supply-i.e.-potential-soil-water-uptake" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The APSIM-Wheat module can be coupled to either the SWIM2 module (see
+module documentation) or the SOILWAT2 module (default). When the APSIM-Wheat
+module is coupled to APSIM-SOILWAT2, potential soil water uptake (or
+water supply, <span class="math inline">\(W_{s}\)</span>) is calculated using the approach first advocated
+by Monteith (1986). Crop water supply is considered as the sum of
+potential root water uptake from each profile layer occupied by root.
+If roots are only partially through a layer available soil water is
+scaled to the portion that contains roots. The potential rate of extraction
+in a layer is calculated using a rate constant (KL) as actual extractable
+soil water. The KL defines the fraction of available water able to
+be extracted per day. The KL factor is empirically derived, incorporating
+both plant and soil factors which limit rate of water uptake. Root
+water extraction values (KL) must be defined for each combination
+of crop species and soil type.</p>
+<p><span class="math display" id="eq:WaterSupply">\[\begin{equation}
+
+\begin{array}{c}
+\begin{array}{cc}
+W_{s}(i) &amp; =\text{KL}(i)[\text{SW}(i)-\text{LL}(i)]\qquad\qquad if\,i\leq I-1\\
+ &amp; =\frac{D_{r}(i)}{D_{s}(i)}\text{KL}(i)[\text{SW}(i)-\text{LL}(i)]\qquad\qquad if\,i=I
+\end{array}\\
+W_{s}=\sum_{i=1}^{I}W_{s}(i)
+\end{array} \tag{11.5}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(i\)</span> is the soil layer, <span class="math inline">\(I\)</span> is the deepest soil layer where
+roots are present, <span class="math inline">\(W_{s}(i)\)</span> is the water supply available from
+layer <span class="math inline">\(i\)</span>, <span class="math inline">\(W_{s}\)</span> is the crop water supply, <span class="math inline">\(\text{SW}(i)\)</span> is
+the soil water content in layer <span class="math inline">\(i\)</span>, <span class="math inline">\(\text{LL}(i)\)</span> is the lower
+limit of plant-extractable soil water in layer <span class="math inline">\(i\)</span>, <span class="math inline">\(\text{KL}(i)\)</span>
+is the root water extraction values in layer <span class="math inline">\(i\)</span>, <span class="math inline">\(D_{r}(i)\)</span> is
+the root depth within the soil layer (<span class="math inline">\(i\)</span>) where roots are present,
+and <span class="math inline">\(D_{s}(i)\)</span> is the thickness of this layer <span class="math inline">\(i\)</span>.</p>
+</div>
+<div id="actual-soil-water-uptake" class="section level2 hasAnchor">
+<h2><span class="header-section-number">11.4</span> Actual soil water uptake<a href="Crop-Water-Relations.html#actual-soil-water-uptake" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The actual rate of water uptake is the lesser of the potential soil
+water supply (<span class="math inline">\(W_{s}\)</span>, Equation <a href="Crop-Water-Relations.html#eq:WaterSupply">(11.5)</a>) and the soil water
+demand (<span class="math inline">\(W_{d}\)</span>, Equation <a href="Crop-Water-Relations.html#eq:soilWaterDemand">(11.1)</a>), which is determining
+whether biomass production is limited by radiation or water uptake
+(Equation <a href="biomass-accumulation-photosynthesis.html#eq:actualBiomassProduction">(4.13)</a>)</p>
+<p><span class="math display" id="eq:WaterUpdate">\[\begin{equation}
+
+W_{u}=\min(W_{d},\,W_{s}) \tag{11.6}
+
+\end{equation}\]</span></p>
+<p>If the potential soil water supply (accessible by the roots) exceeds
+the crop water demand, then the actual soil water uptake (<span class="math inline">\(W_{u}\)</span>)
+is removed from the occupied layers in proportion to the values of
+potential root water uptake in each layer. If the computed soil water
+supply from the profile is less than the demand then, and the actual
+root water uptake from a layer is equal to the computed potential
+uptake. If there are not soil water supply and demand, soil water
+update equals to zero.</p>
+<p><span class="math display">\[\begin{equation}
+
+\begin{array}{c}
+\Delta W_{s}(i)=-W_{s}(i)\times\frac{W_{d}}{W_{s}}\qquad if\;W_{s}&lt;W_{d}\\
+\Delta W_{s}(i)=-W_{s}(i)\qquad if\;W_{s}&gt;W_{d}\\
+\Delta W_{s}(i)=0\qquad if\;W_{s}=W_{d}=0
+\end{array}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta W_{s}(i)\)</span> is the daily change in soil water content
+at layer <span class="math inline">\(i\)</span> (where roots are present), and <span class="math inline">\(W_{s}(i)\)</span> is the water
+supply available from layer <span class="math inline">\(i\)</span> (Equation <a href="Crop-Water-Relations.html#eq:WaterSupply">(11.5)</a>) .</p>
+</div>
+<div id="soil-water-stresses-affecting-plant-growth" class="section level2 hasAnchor">
+<h2><span class="header-section-number">11.5</span> Soil water stresses affecting plant growth<a href="Crop-Water-Relations.html#soil-water-stresses-affecting-plant-growth" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Soil water deficit factors are calculated to simulate the effects
+of water stress on different plant growth-and-development processes.
+Three water deficit factors are calculated which correspond to four
+plant processes, each having different sensitivity to water stress
+i.e. photosynthesis, leaf expansion, and phenology.</p>
+<p>Each of these factors is capped between 0 and 1, where the value of
+0 corresponds to a complete stress, while 1 corresponds to no stress.</p>
+<p>Leaf expansion is considered more sensitive to stress than photosynthesis,
+while soil water has no impact on crop phenology in the current APSIM-Wheat
+version.</p>
+<div id="phenology-1" class="section level3 hasAnchor">
+<h3><span class="header-section-number">11.5.1</span> Phenology<a href="Crop-Water-Relations.html#phenology-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Soil water stress of phenology is determined by the soil water deficiency.</p>
+<p><span class="math display" id="eq:SoilWaterStress">\[\begin{equation}
+
+f_{W,\,pheno}=h_{w,\,pheno}(\frac{esw_{a}}{esw_{p}}) \tag{11.7}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(esw_{a}\)</span> is the actual extractable soil water in root layers,
+<span class="math inline">\(esw_{p}\)</span> is the potential extractable soil water in root layers.
+<span class="math inline">\(h_{w,\,pheno}\)</span> is a function of soil water available ratio and soil
+water stress, which is defined by parameters <code>x_sw_avail_ratio</code>
+and <code>y_swdef_pheno</code> (default value 1) in wheat.xml and linearly
+interpolated by APSIM. In the current version of APSIM-Wheat module,
+no soil water stress for phenology is applied (Fig. <a href="Crop-Water-Relations.html#fig:wdSoilWaterStressPhenology">11.3</a>).
+The soil water stress of phenology for flowering (<code>x_sw_avail_ratio_flowering</code>
+and <code>y_swdef_pheno_flowering</code>) and grain filling (<code>x_sw_avail_ratio_start_grain_fill</code>
+and <code>y_swdef_pheno_start_grain_fill</code>) phases are calculated
+in the source code, but don’t have influence on the phenology of wheat
+in the current APSIM-Wheat version (default value of 1).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdSoilWaterStressPhenology"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdSoilWaterStressPhenology-1.png" alt="Relationship between soil water stress factor affecting phenology ($f_{W,\, pheno}$) and the ratio of available soil water ($\frac{esw_{a}}{esw_{p}}$)." width="100%" />
+<p class="caption">
+Figure 11.3: Relationship between soil water stress factor affecting phenology (<span class="math inline">\(f_{W,\, pheno}\)</span>) and the ratio of available soil water (<span class="math inline">\(\frac{esw_{a}}{esw_{p}}\)</span>).
+</p>
+</div>
+</div>
+<div id="photosynthesis" class="section level3 hasAnchor">
+<h3><span class="header-section-number">11.5.2</span> Photosynthesis<a href="Crop-Water-Relations.html#photosynthesis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Soil water stress of biomass accumulation (<span class="math inline">\(f_{w,\,photo}\)</span>) is calculated
+as follows.</p>
+<p><span class="math display" id="eq:swstressphoto">\[\begin{equation}
+
+f_{w,\,photo}=\frac{W_{u}}{W_{d}} \tag{11.8}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(W_{u}\)</span> is the total daily water uptake from root system (Equation <a href="Crop-Water-Relations.html#eq:WaterUpdate">(11.6)</a>),
+<span class="math inline">\(W_{d}\)</span> is the soil water demand of <code>Leaf</code> and <code>Head</code>
+parts (Equation <a href="Crop-Water-Relations.html#eq:soilWaterDemand">(11.1)</a>).</p>
+<p>Finally, the potential biomass production (radiation-limited<span class="math inline">\(\Delta Q\)</span>)
+can limit by water uptake (<span class="math inline">\(f_{w,\,photo}&lt;1\)</span>, i.e. when <span class="math inline">\(W_{u}&lt;W_{d}\)</span>),
+or not (when <span class="math inline">\(f_{w,\,photo}=1\)</span>, i.e. when <span class="math inline">\(W_{u}=W_{d}\)</span>)</p>
+<p><span class="math display" id="eq:WaterStressBiomassProduction">\[\begin{equation}
+
+\Delta Q_{w}=\Delta Q_{r}f_{w,\,photo}=\Delta Q_{r}\frac{W_{u}}{W_{d}} \tag{11.9}
+
+\end{equation}\]</span></p>
+<p><span class="math inline">\(f_{w,photo}\)</span> also affect the senescence of the leaves.</p>
+</div>
+<div id="leaf-expansion" class="section level3 hasAnchor">
+<h3><span class="header-section-number">11.5.3</span> Leaf expansion<a href="Crop-Water-Relations.html#leaf-expansion" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Soil water stress of leaf expansion is determined by the deficit of
+soil water.</p>
+<p><span class="math display" id="eq:WaterStressLeafExpansion">\[\begin{equation}
+
+f_{W,\,expan}=h_{w,\,expan}(\frac{W_{u}}{W_{d}}) \tag{11.10}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(W_{u}\)</span> is the crop water uptake (Equation <a href="Crop-Water-Relations.html#eq:WaterUpdate">(11.6)</a>),
+<span class="math inline">\(W_{d}\)</span> is the crop water demand (Equation <a href="Crop-Water-Relations.html#eq:soilWaterDemand">(11.1)</a>).
+<span class="math inline">\(h_{w,\,expan}\)</span> is a function of soil water content and stress, and
+is defined by parameters <code>x_sw_demand_ratio</code> and <code>y_swdef_leaf</code>
+in the wheat.xml, which is linearly interpolated by APSIM (Fig. <a href="Crop-Water-Relations.html#fig:wdWaterStress4LeafExpansion">11.4</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdWaterStress4LeafExpansion"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdWaterStress4LeafExpansion-1.png" alt="Relationship between the soil water stress factor affecting expansion ($f_{W,\, expan}$) and supply:demand ratio ($\frac{W_{e}}{W_{d}}$)." width="100%" />
+<p class="caption">
+Figure 11.4: Relationship between the soil water stress factor affecting expansion (<span class="math inline">\(f_{W,\, expan}\)</span>) and supply:demand ratio (<span class="math inline">\(\frac{W_{e}}{W_{d}}\)</span>).
+</p>
+</div>
+</div>
+</div>
+<div id="kl-factor" class="section level2 hasAnchor">
+<h2><span class="header-section-number">11.6</span> KL factor<a href="Crop-Water-Relations.html#kl-factor" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>APSIM 7.5 introduces a modifying factor on KL (rate of maximum daily
+water uptake per day) where there is an excess of chloride concentration
+(Cl), exchangeable sodium percentage (ESP), or electrical conductivity
+(EC) properties in the soil . The KL
+modifier is optional and triggered by setting the ModifyKL parameter
+to <code>yes</code>.</p>
+<p>When the KL modifier is activated, KL values are modified for each
+layer, by factors (concerning Cl, ESP, EC; Fig. <a href="Crop-Water-Relations.html#fig:wdKLFactoring">11.5</a>)
+applied to default KL values. The modifiers are calculated using one
+of the limiting factors in order of preference (Cl, ESP, EC), i.e.
+KL is modified only if there are no soil parameters for Cl. The parameters
+in the wheat.xml that control this mechanism are ClA, CLB, ESPA, ESPB,
+ECA, ECB (slope and intercept of linear relationship for Cl, ESP and
+EC).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdKLFactoring"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdKLFactoring-1.png" alt="The KL factor in response to chloride concentration (Cl mg kg$^{-1}$, Exchangeable sodium percentage (ESP, \%) and soil electrical conductivity (EC, dS m$^{-1}$." width="100%" />
+<p class="caption">
+Figure 11.5: The KL factor in response to chloride concentration (Cl mg kg<span class="math inline">\(^{-1}\)</span>, Exchangeable sodium percentage (ESP, %) and soil electrical conductivity (EC, dS m<span class="math inline">\(^{-1}\)</span>.
+</p>
+</div>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="senescence.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="nitrogen.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/byzheng/apsim-classic-wheat-doc/edit/master/11-water.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

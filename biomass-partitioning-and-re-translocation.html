@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5 Biomass partitioning and re-translocation | APSIM Classic Wheat Documentation</title>
+  <meta name="description" content="This book is the documentation for APSIM Classic Wheat model." />
+  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="5 Biomass partitioning and re-translocation | APSIM Classic Wheat Documentation" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="5 Biomass partitioning and re-translocation | APSIM Classic Wheat Documentation" />
+  
+  <meta name="twitter:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+<meta name="author" content="Bangyou Zheng" />
+
+
+<meta name="date" content="2022-12-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="biomass-accumulation-photosynthesis.html"/>
+<link rel="next" href="head-development.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">APSIM Wheat Doc</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="scope.html"><a href="scope.html"><i class="fa fa-check"></i><b>1</b> Scope of the APSIM-Wheat module</a></li>
+<li class="chapter" data-level="2" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>2</b> APSIM-Wheat history</a></li>
+<li class="chapter" data-level="3" data-path="phenology.html"><a href="phenology.html"><i class="fa fa-check"></i><b>3</b> Phenology</a><ul>
+<li class="chapter" data-level="3.1" data-path="phenology.html"><a href="phenology.html#thermal-time-calculation"><i class="fa fa-check"></i><b>3.1</b> Thermal time calculation</a></li>
+<li class="chapter" data-level="3.2" data-path="phenology.html"><a href="phenology.html#sowing-germination-phase"><i class="fa fa-check"></i><b>3.2</b> Sowing-germination phase</a></li>
+<li class="chapter" data-level="3.3" data-path="phenology.html"><a href="phenology.html#germination-emergence-phase"><i class="fa fa-check"></i><b>3.3</b> Germination-emergence phase</a></li>
+<li class="chapter" data-level="3.4" data-path="phenology.html"><a href="phenology.html#photoperiod-impact-on-phenology"><i class="fa fa-check"></i><b>3.4</b> Photoperiod impact on phenology</a></li>
+<li class="chapter" data-level="3.5" data-path="phenology.html"><a href="phenology.html#vernalisation-impact-on-phenology"><i class="fa fa-check"></i><b>3.5</b> Vernalisation impact on phenology</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html"><i class="fa fa-check"></i><b>4</b> Biomass accumulation (Photosynthesis)</a><ul>
+<li class="chapter" data-level="4.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#potential-biomass-accumulation-from-radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1</b> Potential biomass accumulation from radiation use efficiency</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-interception"><i class="fa fa-check"></i><b>4.1.1</b> Radiation interception</a></li>
+<li class="chapter" data-level="4.1.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1.2</b> Radiation use efficiency</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#actual-daily-biomass-accumulation"><i class="fa fa-check"></i><b>4.2</b> Actual daily biomass accumulation</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html"><i class="fa fa-check"></i><b>5</b> Biomass partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="5.1" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning"><i class="fa fa-check"></i><b>5.1</b> Biomass partitioning</a></li>
+<li class="chapter" data-level="5.2" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-root"><i class="fa fa-check"></i><b>5.2</b> Biomass partitioning to <code>Root</code></a></li>
+<li class="chapter" data-level="5.3" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-head-pod-textttmeal"><i class="fa fa-check"></i><b>5.3</b> Biomass partitioning to <code>Head</code> (<code>Pod</code>, \texttt{Meal</a></li>
+<li class="chapter" data-level="5.4" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-leaf"><i class="fa fa-check"></i><b>5.4</b> Biomass partitioning to <code>Leaf</code></a></li>
+<li class="chapter" data-level="5.5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-stem"><i class="fa fa-check"></i><b>5.5</b> Biomass partitioning to <code>Stem</code></a></li>
+<li class="chapter" data-level="5.6" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#re-translocation"><i class="fa fa-check"></i><b>5.6</b> Re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="head-development.html"><a href="head-development.html"><i class="fa fa-check"></i><b>6</b> Head development</a><ul>
+<li class="chapter" data-level="6.1" data-path="head-development.html"><a href="head-development.html#grain-number"><i class="fa fa-check"></i><b>6.1</b> Grain number</a></li>
+<li class="chapter" data-level="6.2" data-path="head-development.html"><a href="head-development.html#grain-meal-demand"><i class="fa fa-check"></i><b>6.2</b> <code>Grain</code> (<code>Meal</code>) demand</a></li>
+<li class="chapter" data-level="6.3" data-path="head-development.html"><a href="head-development.html#pod-demand"><i class="fa fa-check"></i><b>6.3</b> <code>Pod</code> demand</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html"><i class="fa fa-check"></i><b>7</b> Leaf and node appearance and crop leaf area</a><ul>
+<li class="chapter" data-level="7.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#node-number"><i class="fa fa-check"></i><b>7.1</b> Node number</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-appearance-rate"><i class="fa fa-check"></i><b>7.1.1</b> Potential node appearance rate</a></li>
+<li class="chapter" data-level="7.1.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-number-daily-increase"><i class="fa fa-check"></i><b>7.1.2</b> Potential node number (daily increase)</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#leaf-number"><i class="fa fa-check"></i><b>7.2</b> Leaf number</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.1</b> Potential leaf number (daily increase)</a></li>
+<li class="chapter" data-level="7.2.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#actual-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.2</b> Actual leaf number (daily increase)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html"><i class="fa fa-check"></i><b>8</b> Leaf area expansion</a><ul>
+<li class="chapter" data-level="8.1" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#actual-leaf-area-daily-increase"><i class="fa fa-check"></i><b>8.1</b> Actual leaf area (daily increase)</a></li>
+<li class="chapter" data-level="8.2" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#stressed-leaf-area"><i class="fa fa-check"></i><b>8.2</b> Stressed leaf area</a></li>
+<li class="chapter" data-level="8.3" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#carbon-limited-leaf-area"><i class="fa fa-check"></i><b>8.3</b> Carbon-limited leaf area</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html"><i class="fa fa-check"></i><b>9</b> Root growth and distribution</a><ul>
+<li class="chapter" data-level="9.1" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-depth-growth"><i class="fa fa-check"></i><b>9.1</b> Root depth growth</a></li>
+<li class="chapter" data-level="9.2" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-length"><i class="fa fa-check"></i><b>9.2</b> Root length</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="senescence.html"><a href="senescence.html"><i class="fa fa-check"></i><b>10</b> Senescence</a><ul>
+<li class="chapter" data-level="10.1" data-path="senescence.html"><a href="senescence.html#leaf-number-senescence"><i class="fa fa-check"></i><b>10.1</b> Leaf number senescence</a></li>
+<li class="chapter" data-level="10.2" data-path="senescence.html"><a href="senescence.html#leaf-area-senescence"><i class="fa fa-check"></i><b>10.2</b> Leaf area senescence</a></li>
+<li class="chapter" data-level="10.3" data-path="senescence.html"><a href="senescence.html#biomass-senescence"><i class="fa fa-check"></i><b>10.3</b> Biomass senescence</a></li>
+<li class="chapter" data-level="10.4" data-path="senescence.html"><a href="senescence.html#root-senescence"><i class="fa fa-check"></i><b>10.4</b> Root senescence</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html"><i class="fa fa-check"></i><b>11</b> Crop Water Relations</a><ul>
+<li class="chapter" data-level="11.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#Crop-water-demand"><i class="fa fa-check"></i><b>11.1</b> Crop water demand</a></li>
+<li class="chapter" data-level="11.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#potential-and-actual-extractable-soil-water"><i class="fa fa-check"></i><b>11.2</b> Potential and actual extractable soil water</a></li>
+<li class="chapter" data-level="11.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#crop-water-supply-i.e.-potential-soil-water-uptake"><i class="fa fa-check"></i><b>11.3</b> Crop water supply, i.e. potential soil water uptake</a></li>
+<li class="chapter" data-level="11.4" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#actual-soil-water-uptake"><i class="fa fa-check"></i><b>11.4</b> Actual soil water uptake</a></li>
+<li class="chapter" data-level="11.5" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#soil-water-stresses-affecting-plant-growth"><i class="fa fa-check"></i><b>11.5</b> Soil water stresses affecting plant growth</a><ul>
+<li class="chapter" data-level="11.5.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#phenology-1"><i class="fa fa-check"></i><b>11.5.1</b> Phenology</a></li>
+<li class="chapter" data-level="11.5.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#photosynthesis"><i class="fa fa-check"></i><b>11.5.2</b> Photosynthesis</a></li>
+<li class="chapter" data-level="11.5.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#leaf-expansion"><i class="fa fa-check"></i><b>11.5.3</b> Leaf expansion</a></li>
+</ul></li>
+<li class="chapter" data-level="11.6" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#kl-factor"><i class="fa fa-check"></i><b>11.6</b> KL factor</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="nitrogen.html"><a href="nitrogen.html"><i class="fa fa-check"></i><b>12</b> Nitrogen</a><ul>
+<li class="chapter" data-level="12.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-supply"><i class="fa fa-check"></i><b>12.1</b> Nitrogen supply</a></li>
+<li class="chapter" data-level="12.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand"><i class="fa fa-check"></i><b>12.2</b> Nitrogen demand</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.2.1</b> Nitrogen demand of <code>Grain</code></a></li>
+<li class="chapter" data-level="12.2.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-other-parts"><i class="fa fa-check"></i><b>12.2.2</b> Nitrogen demand of other parts</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake-partitioning-and-re-translocation"><i class="fa fa-check"></i><b>12.3</b> Nitrogen uptake, partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="12.3.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-concentrations-in-wheat-parts"><i class="fa fa-check"></i><b>12.3.1</b> Nitrogen concentrations in wheat parts</a></li>
+<li class="chapter" data-level="12.3.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake"><i class="fa fa-check"></i><b>12.3.2</b> Nitrogen uptake</a></li>
+<li class="chapter" data-level="12.3.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-translocation"><i class="fa fa-check"></i><b>12.3.3</b> Nitrogen translocation</a></li>
+<li class="chapter" data-level="12.3.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-re-translocation"><i class="fa fa-check"></i><b>12.3.4</b> Nitrogen re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-stresses"><i class="fa fa-check"></i><b>12.4</b> Nitrogen stresses</a><ul>
+<li class="chapter" data-level="12.4.1" data-path="nitrogen.html"><a href="nitrogen.html#phenology-2"><i class="fa fa-check"></i><b>12.4.1</b> Phenology</a></li>
+<li class="chapter" data-level="12.4.2" data-path="nitrogen.html"><a href="nitrogen.html#biomass-accumulation"><i class="fa fa-check"></i><b>12.4.2</b> Biomass accumulation</a></li>
+<li class="chapter" data-level="12.4.3" data-path="nitrogen.html"><a href="nitrogen.html#leaf-appearance-and-expansion-i.e.-leaf-number-and-lai"><i class="fa fa-check"></i><b>12.4.3</b> Leaf appearance and expansion (i.e. leaf number and LAI)</a></li>
+<li class="chapter" data-level="12.4.4" data-path="nitrogen.html"><a href="nitrogen.html#grain-filling-biomass-and-nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.4.4</b> Grain filling (biomass and nitrogen demand of grain)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="Phosphorus-stress.html"><a href="Phosphorus-stress.html"><i class="fa fa-check"></i><b>13</b> Phosphorus</a></li>
+<li class="chapter" data-level="14" data-path="temperature.html"><a href="temperature.html"><i class="fa fa-check"></i><b>14</b> Temperature</a></li>
+<li class="chapter" data-level="15" data-path="light.html"><a href="light.html"><i class="fa fa-check"></i><b>15</b> Light</a></li>
+<li class="chapter" data-level="16" data-path="co2.html"><a href="co2.html"><i class="fa fa-check"></i><b>16</b> CO2</a></li>
+<li class="chapter" data-level="17" data-path="vapour-pressure-deficit-vpd.html"><a href="vapour-pressure-deficit-vpd.html"><i class="fa fa-check"></i><b>17</b> Vapour pressure deficit (VPD)</a></li>
+<li class="chapter" data-level="18" data-path="reference.html"><a href="reference.html"><i class="fa fa-check"></i><b>18</b> Reference</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/byzheng/apsim-classic-wheat-doc" target="blank">Github</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">APSIM Classic Wheat Documentation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="biomass-partitioning-and-re-translocation" class="section level1 hasAnchor">
+<h1><span class="header-section-number">5</span> Biomass partitioning and re-translocation<a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-and-re-translocation" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="biomass-partitioning" class="section level2 hasAnchor">
+<h2><span class="header-section-number">5.1</span> Biomass partitioning<a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the wheat module, wheat is divided into four components or parts:
+<code>Root</code>, <code>Heat</code>, <code>Leaf</code> and <code>Stem</code> (Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:WheatClassStructure">5.1</a>),
+and is derived from a more generic plant module (meaning that it has
+some parts not used or has a terminology, better adapted to other
+crops). <code>Leaf</code> includes only leaf blades. <code>Stem</code> is
+defined in a functional rather than a morphological manner and includes
+plant stems, leaf sheaths and stem-like petioles (not applicable for
+wheat). <code>Head</code> is divided into <code>Grain</code> and <code>Pod</code>
+(which correspond to spike without the grain). Then grain are separated
+into <code>Meal</code> and <code>Oil</code> (not used). The structure of wheat
+parts is shown in Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:WheatClassStructure">5.1</a>.</p>
+
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:WheatClassStructure"></span>
+<img src="figure/wdBiomassPartition.png" alt="The hierarchical structure of wheat parts. Texts in the parentheses are classes of parts. The gray box indicates a plant part not used in wheat." width="100%" />
+<p class="caption">
+Figure 5.1: The hierarchical structure of wheat parts. Texts in the parentheses are classes of parts. The gray box indicates a plant part not used in wheat.
+</p>
+</div>
+<p>On the day of emergence, biomass in plant parts (<code>Root</code>, <code>Head</code>,
+<code>Leaf</code>, <code>Stem</code>, <code>Pod</code>, <code>Meal</code> and <code>Oil</code>)
+are initialized by <code>root_dm_init</code> (set at 0.01 g plant
+in the wheat.xml file), <code>leaf_dm_init</code> (0.003 g plant),
+<code>stem_dm_init</code> (0.0016 g plant), <code>pod_dm_init</code>
+(0 g plant), <code>meal_dm_init</code> (0 g plant),
+<code>oil_dm_init</code> (0 g plant), respectively.
+Daily biomass production (Equation <a href="biomass-accumulation-photosynthesis.html#eq:actualBiomassProduction">(4.13)</a>) is
+then partitioned to different plant parts in different ratios that
+vary with crop stage. Overall, Root biomass are calculated with a
+shoot:root ratio from the above-ground biomass (<span class="math inline">\(\Delta Q\)</span>; Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:BiomassPartition">5.2</a>).
+Then the above-ground biomass are partitioned into the different plant
+parts hierarchically, with biomass being attributed first to <code>Head</code>,
+then <code>Leaf</code> and finally <code>Stem</code>. This means that all
+parts might not have the biomass demand satisfied if the biomass production
+is limited.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:BiomassPartition"></span>
+<img src="figure/wdBiomassPartitioning.png" alt="Biomass partition rules in the APSIM-Wheat module. Texts in the parentheses are partitioning methods of different organ types. The above-ground biomass is used to calculate Root biomass based on a shoot:root ratio, and is then partition to (1) Head based on the demand from Pod and Grain, and then (2) Leaf (proportion of the remaining biomass), and (3) Stem. Re-translocation occurs during grain filling, when the biomass accumulation doesn't satisfy Head demand. Biomass from Stem and Pod are then used to satisfy the Head demand (Pod and Grain)." width="100%" />
+<p class="caption">
+Figure 5.2: Biomass partition rules in the APSIM-Wheat module. Texts in the parentheses are partitioning methods of different organ types. The above-ground biomass is used to calculate Root biomass based on a shoot:root ratio, and is then partition to (1) Head based on the demand from Pod and Grain, and then (2) Leaf (proportion of the remaining biomass), and (3) Stem. Re-translocation occurs during grain filling, when the biomass accumulation doesn’t satisfy Head demand. Biomass from Stem and Pod are then used to satisfy the Head demand (Pod and Grain).
+</p>
+</div>
+</div>
+<div id="biomass-partitioning-to-root" class="section level2 hasAnchor">
+<h2><span class="header-section-number">5.2</span> Biomass partitioning to <code>Root</code><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-root" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Firstly, some biomass are allocated to the root as a ratio of daily
+available biomass (<span class="math inline">\(\Delta Q\)</span>, Equation <a href="biomass-accumulation-photosynthesis.html#eq:BiomassProduction">(4.1)</a>).
+The so-called ‘magic’ fraction of biomass going to <code>Root</code> is
+calculated from a stage-dependent function, but is independent on
+pedo-climatic factors (Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:wdroothootRatio">5.3</a>). All biomass
+in the <code>Root</code> is considered as structural fraction, meaning
+that it cannot be re-translocated to other parts later on.</p>
+<p><span class="math display" id="eq:RootBiomass">\[\begin{equation}
+
+\Delta Q_{root}=\Delta Q\times R_{Root:Shoot} \tag{5.1}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{root}\)</span> is the daily increment in <code>Root</code> biomass;
+and <span class="math inline">\(R_{Root:Shoot}\)</span> is the ratio root:shoot biomass, which is defined
+by x_sta<code>x_stage_no_partition</code> and <code>y_ratio_root_shoot</code>
+in wheat.xml (Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:wdroothootRatio">5.3</a>).</p>
+<p>which is specified in wheat.xml )</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdroothootRatio"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdroothootRatio-1.png" alt="Relationship between ratio of root and shoot and growth stage." width="100%" />
+<p class="caption">
+Figure 5.3: Relationship between ratio of root and shoot and growth stage.
+</p>
+</div>
+</div>
+<div id="biomass-partitioning-to-head-pod-textttmeal" class="section level2 hasAnchor">
+<h2><span class="header-section-number">5.3</span> Biomass partitioning to <code>Head</code> (<code>Pod</code>, \texttt{Meal<a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-head-pod-textttmeal" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>and (not applicable in this version))}</p>
+<p>Then all or part of available biomass (<span class="math inline">\(\Delta Q\)</span>) are partitioned
+into <code>Heads</code> according to total demand of <code>Heads</code> (<code>Meal</code>,
+<code>Oil</code> and <code>Pod</code>). <code>Meal</code> and <code>Pod</code> demands
+are calculated by Equation <a href="head-development.html#eq:MealDemand">(6.1)</a> and Equation <a href="head-development.html#eq:GrainDemand">(6.2)</a>.
+<code>Oil</code> demand always equals to zero in the current version of
+the APSIM-Wheat module. Biomass directly partitioned in <code>Pod</code>
+or <code>Grain</code> is considered as structural and cannot be re-translocated,
+however the biomass providing from re-translocation is accumulated
+as non-structural biomass. The <code>Pod</code> non-structural biomass
+can then be re-translocated into <code>Grain</code> (See Section <span class="citation">(<span class="citeproc-not-found" data-reference-id="ref"><strong>???</strong></span>)</span>(Re-translocation)).</p>
+<p><span class="math display" id="eq:HeadBiomass">\[\begin{equation}
+
+\begin{array}{c}
+\Delta Q_{head}=\min(\Delta Q,\,D_{grain}+D_{pod})\\
+\Delta Q_{grain}=\frac{D_{g}}{D_{head}}\Delta A_{head}\\
+\Delta Q_{pod}=\frac{D_{p}}{D_{head}}\Delta A_{head}
+\end{array} \tag{5.2}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{head}\)</span> is the daily available biomass for <code>Head</code>,
+<span class="math inline">\(D_{head}\)</span>, <span class="math inline">\(D_{grain}\)</span>and <span class="math inline">\(D_{pod}\)</span> are demands for <code>Head</code>,
+<code>Grain</code> and <code>Pod</code>, respectively (see 
+and Section <span class="citation">(<span class="citeproc-not-found" data-reference-id="ref"><strong>???</strong></span>)</span>(Pod-demand)). <span class="math inline">\(\Delta Q_{grain}\)</span> and <span class="math inline">\(\Delta Q_{pod}\)</span>
+are biomass increment of <code>Grain</code> and <code>Pod</code>, respectively.</p>
+</div>
+<div id="biomass-partitioning-to-leaf" class="section level2 hasAnchor">
+<h2><span class="header-section-number">5.4</span> Biomass partitioning to <code>Leaf</code><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-leaf" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Then, the remaining biomass (after the partitioning to the <code>Heads</code>)
+are partitioned into <code>Leaf</code> based on a stage dependent function
+(Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:wdFractionLeaf">5.4</a>). <code>Leaf</code> biomass is considered
+as structural and thus cannot be re-mobilised.</p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{leaf}=(\Delta Q-\Delta Q_{head})\times F_{leaf}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{leaf}\)</span> is the daily increment in <code>Leaf</code> biomass;
+and <span class="math inline">\(F_{leaf}\)</span> is the fraction of available biomass partitioned to
+the leaf, which is defined by <code>x_stage_no_partition</code> and
+<code>y_frac_leaf</code> in wheat.xml (Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:wdFractionLeaf">5.4</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdFractionLeaf"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdFractionLeaf-1.png" alt="Relationship between fraction of leafLeaf  and growth stage." width="100%" />
+<p class="caption">
+Figure 5.4: Relationship between fraction of leafLeaf and growth stage.
+</p>
+</div>
+</div>
+<div id="biomass-partitioning-to-stem" class="section level2 hasAnchor">
+<h2><span class="header-section-number">5.5</span> Biomass partitioning to <code>Stem</code><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-stem" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Finally, the whole remaining biomass (if any) are partitioned into
+<code>Stem</code> (Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:BiomassPartition">5.2</a>). Until the stage <code>start of grain filling</code>, 65% of this biomass is distributed to structural
+biomass (Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:wdStemGrowthStructuralFractionStage">5.5</a>), while
+remaining 35% is allocated in un-structural biomass. Afterwards,
+all new biomass allocated to <code>Stem</code> is for non-structural biomass
+(which can re-mobilised).</p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{stem}=\Delta Q-\Delta Q_{head}-\Delta Q_{leaf}
+
+\end{equation}\]</span></p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{stem.\,structural}=\Delta Q_{stem}\times h_{structual}
+
+\end{equation}\]</span></p>
+<p><span class="math display" id="eq:StemNonStructural">\[\begin{equation}
+
+\Delta Q_{stem.\,non-structural}=\Delta Q_{stem}\times(1-h_{structual}) \tag{5.3}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{stem}\)</span> is the daily increment in <code>Stem</code> biomass;
+<span class="math inline">\(\Delta Q_{stem.\,structural}\)</span> is the structural biomass of <code>Stem</code>;
+<span class="math inline">\(\Delta Q_{stem.\,non-structural}\)</span> is the non-structural biomass
+of <code>Stem</code>; and <span class="math inline">\(h_{structual}\)</span> is the fraction of <code>Stem</code>
+biomass distributed to structural biomass which depends on the growth
+stage (S). <span class="math inline">\(h_{structual}\)</span> is specified by <code>stemGrowthStructuralFraction</code>
+and <code>stemGrowthStructuralFractionStage</code> in wheat.xml, with
+a default value of 0.65 before beginning of grain filling and 0 after.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdStemGrowthStructuralFractionStage"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdStemGrowthStructuralFractionStage-1.png" alt="Relationship between fraction of structural and unstructural biomass in Stem." width="100%" />
+<p class="caption">
+Figure 5.5: Relationship between fraction of structural and unstructural biomass in Stem.
+</p>
+</div>
+</div>
+<div id="re-translocation" class="section level2 hasAnchor">
+<h2><span class="header-section-number">5.6</span> Re-translocation<a href="biomass-partitioning-and-re-translocation.html#re-translocation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>If the supply in assimilate (daily biomass increase) is insufficient
+to meet <code>Grain</code> demand, then re-translocation may occur to
+meet the shortfall (Fig. <a href="biomass-partitioning-and-re-translocation.html#fig:BiomassPartition">5.2</a>). The biomass
+re-translocation first occurs from the <code>Stem</code> non-structural
+biomass. From the start of grain filling, the wheat module allows
+a total re-translocation of up to 20% of <code>Stem</code> biomass per
+day. If required, biomass can then be re-translocated from the <code>Pod</code>
+non-structural biomass. The re-translocated biomass is used to fulfill
+the <code>Grain</code> and <code>Pod</code> demands (
+and Section <span class="citation">(<span class="citeproc-not-found" data-reference-id="ref"><strong>???</strong></span>)</span>(Pod-demand)) and is accumulated as non-structural
+biomass.</p>
+<p><span class="math display">\[\begin{equation}
+
+D_{diff,\,head}=(D_{grain}-\text{\ensuremath{\Delta}}Q_{grain})+(D_{pod}-\Delta Q_{pod})
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(D_{diff,\,head}\)</span> is the unfulfilled demand from the plant,
+<span class="math inline">\(D_{grain}\)</span> and <span class="math inline">\(D_{pod}\)</span> are the demands from <code>Grain</code> and
+<code>Pod</code> ( and Section <span class="citation">(<span class="citeproc-not-found" data-reference-id="ref"><strong>???</strong></span>)</span>(Pod-demand)),
+and <span class="math inline">\(\text{\ensuremath{\Delta}}Q_{grain}\)</span> and <span class="math inline">\(\Delta Q_{pod}\)</span> are
+the daily increments in biomass accumulated to <code>Grain</code> and
+<code>Pod</code> (before re-translocation; Equation <a href="biomass-partitioning-and-re-translocation.html#eq:HeadBiomass">(5.2)</a>).</p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{retrans,\,stem}=\min(D_{diff},\,Q_{stem.\,non-structural}\times20\%)
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{retrans,\,stem}\)</span> is the dry biomass re-translocated
+from <code>Stem</code>, and <span class="math inline">\(Q_{stem.\,non-structural}\)</span> is the non-structural
+part of the <code>Stem</code> biomass (Equation <a href="biomass-partitioning-and-re-translocation.html#eq:StemNonStructural">(5.3)</a>).</p>
+<p><span class="math display">\[\begin{equation}
+
+D_{diff,\,head}=D_{diff,\,head}-\Delta Q_{retrans}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(D_{dff,\,head}\)</span> is updated value of the unfulfilled demand
+from the head.</p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{retrans,\,pod}=\min(D_{diff,\,head},\,Q_{pod,\,non-structural})
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{retrans,\,pod}\)</span> from pod is the dry biomass re-translocated
+from <code>Pod</code>, and <span class="math inline">\(Q_{pod,\,non-structural}\)</span> is the non-structural
+part of the <code>Pod</code> biomass.</p>
+<p><span class="math display">\[\begin{equation}
+
+D_{dff,\,head}=D_{diff,\,head}-\Delta Q_{retrans,\,pod}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(D_{dff,\,head}\)</span> is updated value of the unfulfilled demand
+from the head.</p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{retrans}=\Delta Q_{retrans,\,stem}+\Delta Q_{retrans,\,pod}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{retrans}\)</span> is re-translocated biomass within the
+plant.</p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{grain.\,non-structural=}\Delta Q_{retrans\,to\,grain}=\frac{D_{diff,\,grain}}{D_{diff,\,head}}\Delta Q_{retrans}
+
+\end{equation}\]</span></p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{retrans\,to\,pod}=\frac{D_{diff,\,pod}}{D_{diff,\,head}}\Delta Q_{retrans}
+
+\end{equation}\]</span></p>
+<p><span class="math display">\[\begin{equation}
+
+\Delta Q_{pod.\,non-structural=}\Delta Q_{retrans\,to\,pod}-\Delta Q_{retrans,\,pod}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{grain.\,non-structural}\)</span> and <span class="math inline">\(\Delta Q_{pod.\,non-structural}\)</span>
+are the daily increment in the non-structural part of <code>Grain</code>
+and <code>Pod</code> biomass; <span class="math inline">\(\Delta Q_{retrans\,to\,grain}\)</span> and <span class="math inline">\(\Delta Q_{retrans\,to\,pod}\)</span>
+to pod are the daily biomass re-translocated to <code>Grain</code> and
+<code>Pod</code>; <span class="math inline">\(D_{diff,\,grain}\)</span> and <span class="math inline">\(D_{diff,\,pod}\)</span> are the unfulfilled
+demand of <code>Grain</code> and <code>Pod</code>, which are calculated as
+(<span class="math inline">\(D_{grain}-\Delta Q_{grain}\)</span>) and (<span class="math inline">\(D_{pod}-\Delta Q_{pod}\)</span>), respectively.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="biomass-accumulation-photosynthesis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="head-development.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/byzheng/apsim-classic-wheat-doc/edit/master/05-biomass-partitioning.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

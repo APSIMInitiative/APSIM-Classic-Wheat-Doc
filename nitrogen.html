@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>12 Nitrogen | APSIM Classic Wheat Documentation</title>
+  <meta name="description" content="This book is the documentation for APSIM Classic Wheat model." />
+  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="12 Nitrogen | APSIM Classic Wheat Documentation" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="12 Nitrogen | APSIM Classic Wheat Documentation" />
+  
+  <meta name="twitter:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+<meta name="author" content="Bangyou Zheng" />
+
+
+<meta name="date" content="2022-12-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="Crop-Water-Relations.html"/>
+<link rel="next" href="Phosphorus-stress.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">APSIM Wheat Doc</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="scope.html"><a href="scope.html"><i class="fa fa-check"></i><b>1</b> Scope of the APSIM-Wheat module</a></li>
+<li class="chapter" data-level="2" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>2</b> APSIM-Wheat history</a></li>
+<li class="chapter" data-level="3" data-path="phenology.html"><a href="phenology.html"><i class="fa fa-check"></i><b>3</b> Phenology</a><ul>
+<li class="chapter" data-level="3.1" data-path="phenology.html"><a href="phenology.html#thermal-time-calculation"><i class="fa fa-check"></i><b>3.1</b> Thermal time calculation</a></li>
+<li class="chapter" data-level="3.2" data-path="phenology.html"><a href="phenology.html#sowing-germination-phase"><i class="fa fa-check"></i><b>3.2</b> Sowing-germination phase</a></li>
+<li class="chapter" data-level="3.3" data-path="phenology.html"><a href="phenology.html#germination-emergence-phase"><i class="fa fa-check"></i><b>3.3</b> Germination-emergence phase</a></li>
+<li class="chapter" data-level="3.4" data-path="phenology.html"><a href="phenology.html#photoperiod-impact-on-phenology"><i class="fa fa-check"></i><b>3.4</b> Photoperiod impact on phenology</a></li>
+<li class="chapter" data-level="3.5" data-path="phenology.html"><a href="phenology.html#vernalisation-impact-on-phenology"><i class="fa fa-check"></i><b>3.5</b> Vernalisation impact on phenology</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html"><i class="fa fa-check"></i><b>4</b> Biomass accumulation (Photosynthesis)</a><ul>
+<li class="chapter" data-level="4.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#potential-biomass-accumulation-from-radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1</b> Potential biomass accumulation from radiation use efficiency</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-interception"><i class="fa fa-check"></i><b>4.1.1</b> Radiation interception</a></li>
+<li class="chapter" data-level="4.1.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1.2</b> Radiation use efficiency</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#actual-daily-biomass-accumulation"><i class="fa fa-check"></i><b>4.2</b> Actual daily biomass accumulation</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html"><i class="fa fa-check"></i><b>5</b> Biomass partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="5.1" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning"><i class="fa fa-check"></i><b>5.1</b> Biomass partitioning</a></li>
+<li class="chapter" data-level="5.2" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-root"><i class="fa fa-check"></i><b>5.2</b> Biomass partitioning to <code>Root</code></a></li>
+<li class="chapter" data-level="5.3" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-head-pod-textttmeal"><i class="fa fa-check"></i><b>5.3</b> Biomass partitioning to <code>Head</code> (<code>Pod</code>, \texttt{Meal</a></li>
+<li class="chapter" data-level="5.4" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-leaf"><i class="fa fa-check"></i><b>5.4</b> Biomass partitioning to <code>Leaf</code></a></li>
+<li class="chapter" data-level="5.5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-stem"><i class="fa fa-check"></i><b>5.5</b> Biomass partitioning to <code>Stem</code></a></li>
+<li class="chapter" data-level="5.6" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#re-translocation"><i class="fa fa-check"></i><b>5.6</b> Re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="head-development.html"><a href="head-development.html"><i class="fa fa-check"></i><b>6</b> Head development</a><ul>
+<li class="chapter" data-level="6.1" data-path="head-development.html"><a href="head-development.html#grain-number"><i class="fa fa-check"></i><b>6.1</b> Grain number</a></li>
+<li class="chapter" data-level="6.2" data-path="head-development.html"><a href="head-development.html#grain-meal-demand"><i class="fa fa-check"></i><b>6.2</b> <code>Grain</code> (<code>Meal</code>) demand</a></li>
+<li class="chapter" data-level="6.3" data-path="head-development.html"><a href="head-development.html#pod-demand"><i class="fa fa-check"></i><b>6.3</b> <code>Pod</code> demand</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html"><i class="fa fa-check"></i><b>7</b> Leaf and node appearance and crop leaf area</a><ul>
+<li class="chapter" data-level="7.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#node-number"><i class="fa fa-check"></i><b>7.1</b> Node number</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-appearance-rate"><i class="fa fa-check"></i><b>7.1.1</b> Potential node appearance rate</a></li>
+<li class="chapter" data-level="7.1.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-number-daily-increase"><i class="fa fa-check"></i><b>7.1.2</b> Potential node number (daily increase)</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#leaf-number"><i class="fa fa-check"></i><b>7.2</b> Leaf number</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.1</b> Potential leaf number (daily increase)</a></li>
+<li class="chapter" data-level="7.2.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#actual-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.2</b> Actual leaf number (daily increase)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html"><i class="fa fa-check"></i><b>8</b> Leaf area expansion</a><ul>
+<li class="chapter" data-level="8.1" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#actual-leaf-area-daily-increase"><i class="fa fa-check"></i><b>8.1</b> Actual leaf area (daily increase)</a></li>
+<li class="chapter" data-level="8.2" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#stressed-leaf-area"><i class="fa fa-check"></i><b>8.2</b> Stressed leaf area</a></li>
+<li class="chapter" data-level="8.3" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#carbon-limited-leaf-area"><i class="fa fa-check"></i><b>8.3</b> Carbon-limited leaf area</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html"><i class="fa fa-check"></i><b>9</b> Root growth and distribution</a><ul>
+<li class="chapter" data-level="9.1" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-depth-growth"><i class="fa fa-check"></i><b>9.1</b> Root depth growth</a></li>
+<li class="chapter" data-level="9.2" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-length"><i class="fa fa-check"></i><b>9.2</b> Root length</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="senescence.html"><a href="senescence.html"><i class="fa fa-check"></i><b>10</b> Senescence</a><ul>
+<li class="chapter" data-level="10.1" data-path="senescence.html"><a href="senescence.html#leaf-number-senescence"><i class="fa fa-check"></i><b>10.1</b> Leaf number senescence</a></li>
+<li class="chapter" data-level="10.2" data-path="senescence.html"><a href="senescence.html#leaf-area-senescence"><i class="fa fa-check"></i><b>10.2</b> Leaf area senescence</a></li>
+<li class="chapter" data-level="10.3" data-path="senescence.html"><a href="senescence.html#biomass-senescence"><i class="fa fa-check"></i><b>10.3</b> Biomass senescence</a></li>
+<li class="chapter" data-level="10.4" data-path="senescence.html"><a href="senescence.html#root-senescence"><i class="fa fa-check"></i><b>10.4</b> Root senescence</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html"><i class="fa fa-check"></i><b>11</b> Crop Water Relations</a><ul>
+<li class="chapter" data-level="11.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#Crop-water-demand"><i class="fa fa-check"></i><b>11.1</b> Crop water demand</a></li>
+<li class="chapter" data-level="11.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#potential-and-actual-extractable-soil-water"><i class="fa fa-check"></i><b>11.2</b> Potential and actual extractable soil water</a></li>
+<li class="chapter" data-level="11.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#crop-water-supply-i.e.-potential-soil-water-uptake"><i class="fa fa-check"></i><b>11.3</b> Crop water supply, i.e. potential soil water uptake</a></li>
+<li class="chapter" data-level="11.4" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#actual-soil-water-uptake"><i class="fa fa-check"></i><b>11.4</b> Actual soil water uptake</a></li>
+<li class="chapter" data-level="11.5" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#soil-water-stresses-affecting-plant-growth"><i class="fa fa-check"></i><b>11.5</b> Soil water stresses affecting plant growth</a><ul>
+<li class="chapter" data-level="11.5.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#phenology-1"><i class="fa fa-check"></i><b>11.5.1</b> Phenology</a></li>
+<li class="chapter" data-level="11.5.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#photosynthesis"><i class="fa fa-check"></i><b>11.5.2</b> Photosynthesis</a></li>
+<li class="chapter" data-level="11.5.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#leaf-expansion"><i class="fa fa-check"></i><b>11.5.3</b> Leaf expansion</a></li>
+</ul></li>
+<li class="chapter" data-level="11.6" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#kl-factor"><i class="fa fa-check"></i><b>11.6</b> KL factor</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="nitrogen.html"><a href="nitrogen.html"><i class="fa fa-check"></i><b>12</b> Nitrogen</a><ul>
+<li class="chapter" data-level="12.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-supply"><i class="fa fa-check"></i><b>12.1</b> Nitrogen supply</a></li>
+<li class="chapter" data-level="12.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand"><i class="fa fa-check"></i><b>12.2</b> Nitrogen demand</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.2.1</b> Nitrogen demand of <code>Grain</code></a></li>
+<li class="chapter" data-level="12.2.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-other-parts"><i class="fa fa-check"></i><b>12.2.2</b> Nitrogen demand of other parts</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake-partitioning-and-re-translocation"><i class="fa fa-check"></i><b>12.3</b> Nitrogen uptake, partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="12.3.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-concentrations-in-wheat-parts"><i class="fa fa-check"></i><b>12.3.1</b> Nitrogen concentrations in wheat parts</a></li>
+<li class="chapter" data-level="12.3.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake"><i class="fa fa-check"></i><b>12.3.2</b> Nitrogen uptake</a></li>
+<li class="chapter" data-level="12.3.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-translocation"><i class="fa fa-check"></i><b>12.3.3</b> Nitrogen translocation</a></li>
+<li class="chapter" data-level="12.3.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-re-translocation"><i class="fa fa-check"></i><b>12.3.4</b> Nitrogen re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-stresses"><i class="fa fa-check"></i><b>12.4</b> Nitrogen stresses</a><ul>
+<li class="chapter" data-level="12.4.1" data-path="nitrogen.html"><a href="nitrogen.html#phenology-2"><i class="fa fa-check"></i><b>12.4.1</b> Phenology</a></li>
+<li class="chapter" data-level="12.4.2" data-path="nitrogen.html"><a href="nitrogen.html#biomass-accumulation"><i class="fa fa-check"></i><b>12.4.2</b> Biomass accumulation</a></li>
+<li class="chapter" data-level="12.4.3" data-path="nitrogen.html"><a href="nitrogen.html#leaf-appearance-and-expansion-i.e.-leaf-number-and-lai"><i class="fa fa-check"></i><b>12.4.3</b> Leaf appearance and expansion (i.e. leaf number and LAI)</a></li>
+<li class="chapter" data-level="12.4.4" data-path="nitrogen.html"><a href="nitrogen.html#grain-filling-biomass-and-nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.4.4</b> Grain filling (biomass and nitrogen demand of grain)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="Phosphorus-stress.html"><a href="Phosphorus-stress.html"><i class="fa fa-check"></i><b>13</b> Phosphorus</a></li>
+<li class="chapter" data-level="14" data-path="temperature.html"><a href="temperature.html"><i class="fa fa-check"></i><b>14</b> Temperature</a></li>
+<li class="chapter" data-level="15" data-path="light.html"><a href="light.html"><i class="fa fa-check"></i><b>15</b> Light</a></li>
+<li class="chapter" data-level="16" data-path="co2.html"><a href="co2.html"><i class="fa fa-check"></i><b>16</b> CO2</a></li>
+<li class="chapter" data-level="17" data-path="vapour-pressure-deficit-vpd.html"><a href="vapour-pressure-deficit-vpd.html"><i class="fa fa-check"></i><b>17</b> Vapour pressure deficit (VPD)</a></li>
+<li class="chapter" data-level="18" data-path="reference.html"><a href="reference.html"><i class="fa fa-check"></i><b>18</b> Reference</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/byzheng/apsim-classic-wheat-doc" target="blank">Github</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">APSIM Classic Wheat Documentation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="nitrogen" class="section level1 hasAnchor">
+<h1><span class="header-section-number">12</span> Nitrogen<a href="nitrogen.html#nitrogen" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The nitrogen stress phase begins before 30% floral initiation to
+finish at the ‘harvest ripe’ phase (Fig. <a href="phenology.html#fig:PhenologWheatModule">3.1</a>),
+which are defined by <code>n_stress</code> in wheat.xml.</p>
+<div id="nitrogen-supply" class="section level2 hasAnchor">
+<h2><span class="header-section-number">12.1</span> Nitrogen supply<a href="nitrogen.html#nitrogen-supply" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Ammonium (<span class="math inline">\(\text{NH}_{4}^{+}\)</span>) is not taken up in wheat as wheat.xml
+parameter knh4 (constant for NH extraction) is equal
+to 0.</p>
+<p>The model uses a simplified formulation for nitrate <span class="math inline">\(\text{NO}_{3}^{-}\)</span>
+uptake somewhat similar in structure to that employed in water uptake.
+During the nitrogen stress phase (Fig. <a href="phenology.html#fig:PhenologWheatModule">3.1</a>),
+nitrogen supply for soil layer <span class="math inline">\(i\)</span> (<span class="math inline">\(N_{s}(i)\)</span>, g m)
+is calculated as follows:</p>
+<p><span class="math display">\[\begin{equation}
+
+N_{s}(i)=K_{NO3}N(i)[N(i)\frac{1000}{\text{BD}(i)D_{s}(i)}]\frac{\text{\text{ESW}}_{a}(i)}{\text{ESW}_{p}(i)}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(K_{NO3}\)</span> is a constant of extractable soil nitrogen, which
+is defined by <code>kno3</code> with default value 0.02; <span class="math inline">\(N(i)\)</span> is the
+<span class="math inline">\(\text{NO}_{3}^{-}\)</span>concentration in soil layer <span class="math inline">\(i\)</span> (g m);
+<span class="math inline">\(\text{BD}(i)\)</span> is the bulk density of soil layer <span class="math inline">\(i\)</span> (g cm);
+<span class="math inline">\(D_{s}(i)\)</span> is the depth of soil layer <span class="math inline">\(i\)</span> (cm); <span class="math inline">\(\text{ESW}_{a}(i)\)</span>
+is the actual extractable soil water in soil layer <span class="math inline">\(i\)</span> (Equation <a href="Crop-Water-Relations.html#eq:SoilWaterESW">(11.4)</a>);
+<span class="math inline">\(\text{ESW}_{p}(i)\)</span> is the potential extractable soil water in
+soil layer <span class="math inline">\(i\)</span> (Equation <a href="Crop-Water-Relations.html#eq:SoilWaterESW">(11.4)</a>).</p>
+<p>During non-nitrogen stress phase (Fig. <a href="phenology.html#fig:PhenologWheatModule">3.1</a>),
+wheat could access to all available nitrogen.</p>
+<p><span class="math display" id="eq:NitrogenSupply">\[\begin{equation}
+
+N_{s}(i)=N(i)\frac{1000}{\text{BD}(i)D_{s}(i)} \tag{12.1}
+
+\end{equation}\]</span></p>
+<p>The values of <span class="math inline">\(N_{s}(i)\)</span> for each layer of root presented are summed
+to get a total potential nitrogen uptake (or crop N supply, <span class="math inline">\(N_{s}\)</span>)
+and then each layer <span class="math inline">\(N_{s}(i)\)</span> is scaled by maximum total nitrogen
+uptake (<span class="math inline">\(N_{s,\,max}\)</span>), which is defined by <code>total_n_uptake_max</code>
+with default value 0.6 g m.</p>
+<p><span class="math display">\[\begin{equation}
+
+N_{s}&#39;(i)=N_{s}(i)\frac{N_{s,\,max}}{N_{s}}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(N_{s}&#39;(i)\)</span> is the actual nitrogen uptake in the layer <span class="math inline">\(i\)</span>.</p>
+</div>
+<div id="nitrogen-demand" class="section level2 hasAnchor">
+<h2><span class="header-section-number">12.2</span> Nitrogen demand<a href="nitrogen.html#nitrogen-demand" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Total wheat nitrogen demand is the sum of the N demand in all parts
+(i.e. <code>Leaf</code>, <code>Stem</code>, and <code>Pod</code>). Wheat has a
+defined minimum (<span class="math inline">\(C_{N,\,min}\)</span>), critical (<span class="math inline">\(C_{N,\,crit}\)</span>) and maximum
+(<span class="math inline">\(C_{N,\,max}\)</span>) nitrogen concentration for all plant parts (Fig. <a href="nitrogen.html#fig:wdNitrogenConcentration">12.1</a>).
+These concentration limits change with phenological stages (Fig. <a href="nitrogen.html#fig:wdNitrogenConcentration">12.1</a>).
+And they are defined by parameters <code>x_stage_code</code>, <code>y_n_conc_min_leaf</code>,
+<code>y_n_conc_crit_leaf</code>, <code>y_n_conc_max_leaf</code>, <code>y_n_conc_min_stem</code>,
+<code>y_n_conc_crit_stem</code>, \texttt{y_n_conc_max_stem, y_n_conc_min_pod,
+y_n_conc_crit_pod, y_n_conc_max_pod} in wheat.xml and linearly
+interpolated by APSIM .</p>
+<p>Physiologically, minimum nitrogen concentration (<span class="math inline">\(C_{N,\,min}\)</span>) corresponds
+to the structural N required for the plant structure, and which cannot
+be re-translocated. Critical nitrogen concentration (<span class="math inline">\(C_{N,\,crit}\)</span>)
+corresponds to the minimum concentration of N that plant parts will
+attempt to maintain (it drives the <code>N demand</code>
+of the part), and maximum nitrogen concentration (<span class="math inline">\(C_{N,\,max}\)</span>)
+reflects to the capacity of the part to accumulate the extra available
+N (i.e. fulfilling more than its <code>demand</code>)
+up to a this maximum threshold N.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdNitrogenConcentration"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdNitrogenConcentration-1.png" alt="Relationship between maximum, critical, minimum nitrogen concentration and growth stages for the different plant parts (Leaf, Stem and Pod). Parameters are defined by defined by parameters x_stage_code, y_n_conc_min_leaf, y_n_critonc_crit_leaf, y_n_conc_max_leaf, y_n_conc_min_stem, y_n_critonc_crit_stem, y_n_critonc_max_stem in wheat.xml." width="100%" />
+<p class="caption">
+Figure 12.1: Relationship between maximum, critical, minimum nitrogen concentration and growth stages for the different plant parts (Leaf, Stem and Pod). Parameters are defined by defined by parameters x_stage_code, y_n_conc_min_leaf, y_n_critonc_crit_leaf, y_n_conc_max_leaf, y_n_conc_min_stem, y_n_critonc_crit_stem, y_n_critonc_max_stem in wheat.xml.
+</p>
+</div>
+<div id="nitrogen-demand-of-grain" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.2.1</span> Nitrogen demand of <code>Grain</code><a href="nitrogen.html#nitrogen-demand-of-grain" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><code>Grain</code> nitrogen demand starts at anthesis and is calculated
+from grain number, thermal time and a potential grain nitrogen filling
+rate (g grain <span class="math inline">\(^{\circ}\)</span>Cd).</p>
+<p><span class="math display" id="eq:NitrogenDemand">\[\begin{equation}
+
+N_{D,\;grain}=N_{g}\,R_{N,\,poten,}\,f_{N,\;grain}\,h_{grain}(T) \tag{12.2}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(N_{g}\)</span> is the grain number, <span class="math inline">\(R_{N,\,poten,}\)</span> is the potential
+nitrogen filling rate, which is defined by parameter <code>potential_grain_n_filling_rate</code>
+in wheat.xml with default value 0.000055 g grain
+d. <span class="math inline">\(f_{N,\;grain}\)</span> is the nitrogen factor of
+grain filling (Equation <a href="nitrogen.html#eq:NStressFilling">(12.6)</a>). <span class="math inline">\(h_{grain}(T)\)</span> is a
+function of daily mean temperature (<span class="math inline">\(T\)</span>) to influence of grain filling
+(Fig. <a href="nitrogen.html#fig:wdNitrogenTem">12.2</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:wdNitrogenTem"></span>
+<img src="apsim-classic-wheat-doc_files/figure-html/wdNitrogenTem-1.png" alt="Relationship between nitrogen demand of Grain and daily mean temperature." width="100%" />
+<p class="caption">
+Figure 12.2: Relationship between nitrogen demand of Grain and daily mean temperature.
+</p>
+</div>
+</div>
+<div id="nitrogen-demand-of-other-parts" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.2.2</span> Nitrogen demand of other parts<a href="nitrogen.html#nitrogen-demand-of-other-parts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Demand of nitrogen in each part (except Grain) attempts to maintain
+nitrogen at the critical (non-stressed) level. Nitrogen demand on
+any day is the sum of the demands from the pre-existing biomass of
+each part required to reach critical nitrogen content, plus the nitrogen
+required to maintain critical nitrogen concentrations in that day’s
+produced biomass. For each plant part (<code>Leaf</code>, <code>Stem</code>,
+and <code>Pod</code>) the nitrogen demand is given by:</p>
+<p><span class="math display">\[\begin{equation}
+
+N_{D,\;crit}=\frac{\Delta Q_{part}C_{N,\,crit}}{f_{w,\,photo}}+f_{n}(C_{N,\,crit}-C_{N,\,part})\qquad if\:C_{N,\,crit}&gt;C_{N,\,part}\;\&amp;\;Q_{part}&gt;0
+
+\end{equation}\]</span></p>
+<p><span class="math display">\[\begin{equation}
+
+N_{D,\;max}=\frac{\Delta Q_{part}C_{N,\,max}}{f_{w,\,photo}}+f_{n}(C_{N,\,max}-C_{N,\,part})\qquad if\:C_{N,\,max}&gt;C_{N,\,part}\;\&amp;\;Q_{part}&gt;0
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\Delta Q_{part}\)</span> is the growth dry weight of parts, <span class="math inline">\(Q_{part}\)</span>
+is the green (i.e. not senesced) dry weight of parts, <span class="math inline">\(f_{w,\,photo}\)</span>
+is soil water stress of biomass accumulation (Equation <a href="Crop-Water-Relations.html#eq:swstressphoto">(11.8)</a>);
+<span class="math inline">\(C_{N,\,part}\)</span> is the nitrogen concentration of parts; <span class="math inline">\(f_{n}\)</span> is
+defined by parameter <code>n_deficit_uptake_fraction</code> in wheat.xml
+with default value 0.0001. <span class="math inline">\(C_{N,\,crit}\)</span> and <span class="math inline">\(C_{N,\,max}\)</span> are
+the N concentration critic and maximal of the parts, respectively
+(Fig. <a href="nitrogen.html#fig:wdNitrogenConcentration">12.1</a>). <span class="math inline">\(N_{D,\;crit}\)</span>
+and <span class="math inline">\(N_{D,\;max}\)</span> equal to 0, if <span class="math inline">\(Q_{part}=0\)</span>.</p>
+</div>
+</div>
+<div id="nitrogen-uptake-partitioning-and-re-translocation" class="section level2 hasAnchor">
+<h2><span class="header-section-number">12.3</span> Nitrogen uptake, partitioning and re-translocation<a href="nitrogen.html#nitrogen-uptake-partitioning-and-re-translocation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="nitrogen-concentrations-in-wheat-parts" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.3.1</span> Nitrogen concentrations in wheat parts<a href="nitrogen.html#nitrogen-concentrations-in-wheat-parts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The N concentration in Leaf is calculated as follows:</p>
+<p><span class="math display">\[\begin{equation}
+
+C_{N,\,leaf}=N_{leaf}/Q_{leaf}
+
+\end{equation}\]</span></p>
+</div>
+<div id="nitrogen-uptake" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.3.2</span> Nitrogen uptake<a href="nitrogen.html#nitrogen-uptake" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Daily total nitrogen uptake (<span class="math inline">\(N_{u}\)</span>) is the lesser of N demand (<span class="math inline">\(N_{d}\)</span>,
+Equation <a href="nitrogen.html#eq:NitrogenDemand">(12.2)</a>) and N supply <span class="math inline">\(N_{s}\)</span>, Equation <a href="nitrogen.html#eq:NitrogenSupply">(12.1)</a>).</p>
+<p><span class="math display">\[\begin{equation}
+
+N_{u}=\text{min}(N_{d},\;N_{s})
+
+\end{equation}\]</span></p>
+</div>
+<div id="nitrogen-translocation" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.3.3</span> Nitrogen translocation<a href="nitrogen.html#nitrogen-translocation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Daily total nitrogen uptake is distributed to the plant parts in proportion
+to their individual demands.</p>
+</div>
+<div id="nitrogen-re-translocation" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.3.4</span> Nitrogen re-translocation<a href="nitrogen.html#nitrogen-re-translocation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>If there is insufficient nitrogen supplied from senescing material
+and soil nitrogen uptake, Grain nitrogen demand is met by re-translocating
+nitrogen from other plant parts. Nitrogen is available for re-translocation
+from un-senesced leaves and stems until they reach their defined minimum
+nitrogen concentration. No N re-translocation is attributed to other
+parts than <code>Grain</code>.</p>
+</div>
+</div>
+<div id="nitrogen-stresses" class="section level2 hasAnchor">
+<h2><span class="header-section-number">12.4</span> Nitrogen stresses<a href="nitrogen.html#nitrogen-stresses" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="phenology-2" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.4.1</span> Phenology<a href="nitrogen.html#phenology-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Nitrogen stress on phenology (via <span class="math inline">\(f_{N,\,pheno}\)</span> in Equation <a href="phenology.html#eq:CumThermalTime">(3.4)</a>)
+is determined by the difference between organ nitrogen concentration
+and organ minimum and critical nitrogen concentration.</p>
+<p><span class="math display" id="eq:NitrogenStress">\[\begin{equation}
+
+f_{N,\,pheno}=h_{N,\,pheno}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}} \tag{12.3}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(C_{N}\)</span> is the nitrogen concentration of <code>Stem</code> or <code>Leaf</code>
+parts; <span class="math inline">\(h_{N,\,pheno}\)</span> is multiple for nitrogen deficit effect on
+phenology which is specified by <code>N_fact_pheno</code> in the wheat.xml
+and default value is 100; <span class="math inline">\(C_{N,\,crit}\)</span> and <span class="math inline">\(C_{N,\,min}\)</span> are the
+N concentration critic and minimal of the parts, respectively (Fig. <a href="nitrogen.html#fig:wdNitrogenConcentration">12.1</a>);
+and <span class="math inline">\(f_{c,\,N}\)</span> is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO for <code>Leaf</code> (Fig. <a href="head-development.html#fig:wbCO2CritLeaf">6.2</a>).</p>
+<p>The nitrogen stress on phenology is used in the calculation of the
+<code>adjusted</code> thermal time (Equation <a href="phenology.html#eq:CumThermalTime">(3.4)</a>).
+However, In the current version of APSIM-Wheat module, the default
+parameters are applied for no nitrogen water stress for phenology.</p>
+</div>
+<div id="biomass-accumulation" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.4.2</span> Biomass accumulation<a href="nitrogen.html#biomass-accumulation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Nitrogen stress on biomass accumulation (via <span class="math inline">\(f_{N,\,photo}\)</span> in Equation <a href="biomass-accumulation-photosynthesis.html#eq:StressFactor4Photosynthesis">(4.5)</a>)
+is determined by the difference between leaf nitrogen concentration
+and leaf minimum and critical nitrogen concentration.</p>
+<p><span class="math display" id="eq:NStressPhoto">\[\begin{equation}
+
+f_{N,\,photo}=h_{N,\,photo}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}} \tag{12.4}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(C_{N}\)</span> is the nitrogen concentration of <code>Leaf</code> parts;
+<span class="math inline">\(h_{N,\,photo}\)</span> is multiplier for nitrogen deficit effect on photosynthesis
+which is specified by <code>N_fact_photo</code> in the wheat.xml and
+default value is 1.5; <span class="math inline">\(C_{N,\,crit}\)</span> and <span class="math inline">\(C_{N,\,min}\)</span> are the N
+concentration critic and minimal of the parts, respectively (Fig. <a href="nitrogen.html#fig:wdNitrogenConcentration">12.1</a>);
+and <span class="math inline">\(f_{c,\,N}\)</span> is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO for <code>Leaf</code> (Fig. <a href="head-development.html#fig:wbCO2CritLeaf">6.2</a>).</p>
+<p>The nitrogen stress on biomass accumulation affects the radiation-limited
+biomass accumulation (<span class="math inline">\(\Delta Q_{r}\)</span>, Equation <a href="biomass-accumulation-photosynthesis.html#eq:actualBiomassProduction">(4.13)</a>).</p>
+</div>
+<div id="leaf-appearance-and-expansion-i.e.-leaf-number-and-lai" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.4.3</span> Leaf appearance and expansion (i.e. leaf number and LAI)<a href="nitrogen.html#leaf-appearance-and-expansion-i.e.-leaf-number-and-lai" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Nitrogen stress on leaf appearance and expansion (via <span class="math inline">\(f_{N,\,expan}\)</span>
+in Equation <a href="leaf-and-node-appearance-and-crop-leaf-area.html#eq:LeafExpansionStress">(7.4)</a>) is determined by the difference
+between leaf nitrogen concentration and leaf minimum and critical
+nitrogen concentration.</p>
+<p><span class="math display" id="eq:NStressLeafExpansion">\[\begin{equation}
+
+f_{N,\,expan}=h_{N,\,expan}\sum_{leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}} \tag{12.5}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(C_{N}\)</span> is the nitrogen concentration of <code>Leaf</code> parts;
+<span class="math inline">\(h_{N,\,expan}\)</span> is multiplier for nitrogen deficit effect on expansion
+which is specified by <code>N_fact_expansion</code> in the wheat.xml
+(default value 1); <span class="math inline">\(C_{N,\,crit}\)</span> and <span class="math inline">\(C_{N,\,min}\)</span> are the N concentration
+critic and minimal of the parts, respectively (Fig. <a href="nitrogen.html#fig:wdNitrogenConcentration">12.1</a>);
+and <span class="math inline">\(f_{c,\,N}\)</span> is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO for <code>Leaf</code> (Fig. <a href="head-development.html#fig:wbCO2CritLeaf">6.2</a>).</p>
+<p>The nitrogen stress on leaf appearance and expansion affects the potential
+leaf number (<span class="math inline">\(N_{d,\,pot}\)</span>; Equation <a href="leaf-and-node-appearance-and-crop-leaf-area.html#eq:PotentialNodeNumberDaily">(7.3)</a>)
+and the stressed leaf area index (<span class="math inline">\(\Delta\text{LAI}_{d,\,s}\)</span>, Equation <a href="leaf-area-expansion.html#eq:StressLeafArea">(8.1)</a>).</p>
+</div>
+<div id="grain-filling-biomass-and-nitrogen-demand-of-grain" class="section level3 hasAnchor">
+<h3><span class="header-section-number">12.4.4</span> Grain filling (biomass and nitrogen demand of grain)<a href="nitrogen.html#grain-filling-biomass-and-nitrogen-demand-of-grain" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Nitrogen stress on grain filling affects the biomass demand of <code>Grain</code>
+(via <span class="math inline">\(f_{N,\,grain}\)</span> in Equation <a href="head-development.html#eq:MealDemand">(6.1)</a>) and the N demand
+of <code>Grain</code> (Equation <a href="nitrogen.html#eq:NitrogenDemand">(12.2)</a>).</p>
+<p>The nitrogen factor <span class="math inline">\(f_{N,\,grain}\)</span> (that impacts N demand of grain)
+is determined by the difference between organ nitrogen concentration
+and organ minimum and critical nitrogen concentration as follows:.</p>
+<p><span class="math display" id="eq:NStressFilling">\[\begin{equation}
+
+f_{N,\,grain}=\frac{h_{N,\ poten}}{h_{N,\ min}}h_{N,\,grain}\sum_{stem,\,leaf}\frac{C_{N}-C_{N,\,min}}{C_{N,\,crit}\times f_{c,\,N}-C_{N,\,min}}\qquad(0\leq f_{N,\,fill}\leq1) \tag{12.6}
+
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(h_{N,\ poten}\)</span> is the potential rate of grain filling which
+is specified by <code>potential_grain_n_filling_rate</code> in wheat.xml
+and has a default value of 0.000055 g grain d;
+<span class="math inline">\(h_{N,\ min}\)</span> is the minimum rate of grain filling which is specified
+by <code>minimum_grain_n_filling_rate</code> in wheat.xml and has
+a default value of 0.000015 g grain d;
+<span class="math inline">\(h_{N,\,grain}\)</span> is a multiplier for nitrogen deficit effect on grain,
+which is specified by <code>n_fact_grain</code> in wheat.xml and has
+a default value of 1; <span class="math inline">\(C_{N}\)</span> is the nitrogen concentration of <code>Stem</code>
+or <code>Leaf</code> parts; <span class="math inline">\(C_{N,\,crit}\)</span> and <span class="math inline">\(C_{N,\,min}\)</span> are critical
+and minimum nitrogen concentration, respectively, for <code>Stem</code>
+and <code>Leaf</code> parts. <span class="math inline">\(C_{N,\,crit}\)</span> and <span class="math inline">\(C_{N,\,min}\)</span> are functions
+of growth stage and nitrogen concentration which is defined by parameters
+<code>x_stage_code</code>, <code>y_n_conc_min_leaf</code>, <code>y_n_conc_crit_leaf</code>,
+<code>y_n_conc_min_stem</code>, <code>y_n_conc_crit_stem</code> in
+wheat.xml and linearly interpolated by APSIM (Fig. <a href="nitrogen.html#fig:wdNitrogenConcentration">12.1</a>);
+and <span class="math inline">\(f_{c,\,N}\)</span> is a factor with a value of 1 (i.e. no impact) for
+Stem, and is depending on CO for <code>Leaf</code> (Fig. <a href="head-development.html#fig:wbCO2CritLeaf">6.2</a>).</p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="Crop-Water-Relations.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="Phosphorus-stress.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/byzheng/apsim-classic-wheat-doc/edit/master/12-nitrogen.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2 APSIM-Wheat history | APSIM Classic Wheat Documentation</title>
+  <meta name="description" content="This book is the documentation for APSIM Classic Wheat model." />
+  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2 APSIM-Wheat history | APSIM Classic Wheat Documentation" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2 APSIM-Wheat history | APSIM Classic Wheat Documentation" />
+  
+  <meta name="twitter:description" content="This book is the documentation for APSIM Classic Wheat model." />
+  
+
+<meta name="author" content="Bangyou Zheng" />
+
+
+<meta name="date" content="2022-12-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="scope.html"/>
+<link rel="next" href="phenology.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">APSIM Wheat Doc</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="scope.html"><a href="scope.html"><i class="fa fa-check"></i><b>1</b> Scope of the APSIM-Wheat module</a></li>
+<li class="chapter" data-level="2" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>2</b> APSIM-Wheat history</a></li>
+<li class="chapter" data-level="3" data-path="phenology.html"><a href="phenology.html"><i class="fa fa-check"></i><b>3</b> Phenology</a><ul>
+<li class="chapter" data-level="3.1" data-path="phenology.html"><a href="phenology.html#thermal-time-calculation"><i class="fa fa-check"></i><b>3.1</b> Thermal time calculation</a></li>
+<li class="chapter" data-level="3.2" data-path="phenology.html"><a href="phenology.html#sowing-germination-phase"><i class="fa fa-check"></i><b>3.2</b> Sowing-germination phase</a></li>
+<li class="chapter" data-level="3.3" data-path="phenology.html"><a href="phenology.html#germination-emergence-phase"><i class="fa fa-check"></i><b>3.3</b> Germination-emergence phase</a></li>
+<li class="chapter" data-level="3.4" data-path="phenology.html"><a href="phenology.html#photoperiod-impact-on-phenology"><i class="fa fa-check"></i><b>3.4</b> Photoperiod impact on phenology</a></li>
+<li class="chapter" data-level="3.5" data-path="phenology.html"><a href="phenology.html#vernalisation-impact-on-phenology"><i class="fa fa-check"></i><b>3.5</b> Vernalisation impact on phenology</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html"><i class="fa fa-check"></i><b>4</b> Biomass accumulation (Photosynthesis)</a><ul>
+<li class="chapter" data-level="4.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#potential-biomass-accumulation-from-radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1</b> Potential biomass accumulation from radiation use efficiency</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-interception"><i class="fa fa-check"></i><b>4.1.1</b> Radiation interception</a></li>
+<li class="chapter" data-level="4.1.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#radiation-use-efficiency"><i class="fa fa-check"></i><b>4.1.2</b> Radiation use efficiency</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="biomass-accumulation-photosynthesis.html"><a href="biomass-accumulation-photosynthesis.html#actual-daily-biomass-accumulation"><i class="fa fa-check"></i><b>4.2</b> Actual daily biomass accumulation</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html"><i class="fa fa-check"></i><b>5</b> Biomass partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="5.1" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning"><i class="fa fa-check"></i><b>5.1</b> Biomass partitioning</a></li>
+<li class="chapter" data-level="5.2" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-root"><i class="fa fa-check"></i><b>5.2</b> Biomass partitioning to <code>Root</code></a></li>
+<li class="chapter" data-level="5.3" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-head-pod-textttmeal"><i class="fa fa-check"></i><b>5.3</b> Biomass partitioning to <code>Head</code> (<code>Pod</code>, \texttt{Meal</a></li>
+<li class="chapter" data-level="5.4" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-leaf"><i class="fa fa-check"></i><b>5.4</b> Biomass partitioning to <code>Leaf</code></a></li>
+<li class="chapter" data-level="5.5" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#biomass-partitioning-to-stem"><i class="fa fa-check"></i><b>5.5</b> Biomass partitioning to <code>Stem</code></a></li>
+<li class="chapter" data-level="5.6" data-path="biomass-partitioning-and-re-translocation.html"><a href="biomass-partitioning-and-re-translocation.html#re-translocation"><i class="fa fa-check"></i><b>5.6</b> Re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="head-development.html"><a href="head-development.html"><i class="fa fa-check"></i><b>6</b> Head development</a><ul>
+<li class="chapter" data-level="6.1" data-path="head-development.html"><a href="head-development.html#grain-number"><i class="fa fa-check"></i><b>6.1</b> Grain number</a></li>
+<li class="chapter" data-level="6.2" data-path="head-development.html"><a href="head-development.html#grain-meal-demand"><i class="fa fa-check"></i><b>6.2</b> <code>Grain</code> (<code>Meal</code>) demand</a></li>
+<li class="chapter" data-level="6.3" data-path="head-development.html"><a href="head-development.html#pod-demand"><i class="fa fa-check"></i><b>6.3</b> <code>Pod</code> demand</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html"><i class="fa fa-check"></i><b>7</b> Leaf and node appearance and crop leaf area</a><ul>
+<li class="chapter" data-level="7.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#node-number"><i class="fa fa-check"></i><b>7.1</b> Node number</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-appearance-rate"><i class="fa fa-check"></i><b>7.1.1</b> Potential node appearance rate</a></li>
+<li class="chapter" data-level="7.1.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-node-number-daily-increase"><i class="fa fa-check"></i><b>7.1.2</b> Potential node number (daily increase)</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#leaf-number"><i class="fa fa-check"></i><b>7.2</b> Leaf number</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#potential-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.1</b> Potential leaf number (daily increase)</a></li>
+<li class="chapter" data-level="7.2.2" data-path="leaf-and-node-appearance-and-crop-leaf-area.html"><a href="leaf-and-node-appearance-and-crop-leaf-area.html#actual-leaf-number-daily-increase"><i class="fa fa-check"></i><b>7.2.2</b> Actual leaf number (daily increase)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html"><i class="fa fa-check"></i><b>8</b> Leaf area expansion</a><ul>
+<li class="chapter" data-level="8.1" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#actual-leaf-area-daily-increase"><i class="fa fa-check"></i><b>8.1</b> Actual leaf area (daily increase)</a></li>
+<li class="chapter" data-level="8.2" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#stressed-leaf-area"><i class="fa fa-check"></i><b>8.2</b> Stressed leaf area</a></li>
+<li class="chapter" data-level="8.3" data-path="leaf-area-expansion.html"><a href="leaf-area-expansion.html#carbon-limited-leaf-area"><i class="fa fa-check"></i><b>8.3</b> Carbon-limited leaf area</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html"><i class="fa fa-check"></i><b>9</b> Root growth and distribution</a><ul>
+<li class="chapter" data-level="9.1" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-depth-growth"><i class="fa fa-check"></i><b>9.1</b> Root depth growth</a></li>
+<li class="chapter" data-level="9.2" data-path="root-growth-and-distribution.html"><a href="root-growth-and-distribution.html#root-length"><i class="fa fa-check"></i><b>9.2</b> Root length</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="senescence.html"><a href="senescence.html"><i class="fa fa-check"></i><b>10</b> Senescence</a><ul>
+<li class="chapter" data-level="10.1" data-path="senescence.html"><a href="senescence.html#leaf-number-senescence"><i class="fa fa-check"></i><b>10.1</b> Leaf number senescence</a></li>
+<li class="chapter" data-level="10.2" data-path="senescence.html"><a href="senescence.html#leaf-area-senescence"><i class="fa fa-check"></i><b>10.2</b> Leaf area senescence</a></li>
+<li class="chapter" data-level="10.3" data-path="senescence.html"><a href="senescence.html#biomass-senescence"><i class="fa fa-check"></i><b>10.3</b> Biomass senescence</a></li>
+<li class="chapter" data-level="10.4" data-path="senescence.html"><a href="senescence.html#root-senescence"><i class="fa fa-check"></i><b>10.4</b> Root senescence</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html"><i class="fa fa-check"></i><b>11</b> Crop Water Relations</a><ul>
+<li class="chapter" data-level="11.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#Crop-water-demand"><i class="fa fa-check"></i><b>11.1</b> Crop water demand</a></li>
+<li class="chapter" data-level="11.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#potential-and-actual-extractable-soil-water"><i class="fa fa-check"></i><b>11.2</b> Potential and actual extractable soil water</a></li>
+<li class="chapter" data-level="11.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#crop-water-supply-i.e.-potential-soil-water-uptake"><i class="fa fa-check"></i><b>11.3</b> Crop water supply, i.e. potential soil water uptake</a></li>
+<li class="chapter" data-level="11.4" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#actual-soil-water-uptake"><i class="fa fa-check"></i><b>11.4</b> Actual soil water uptake</a></li>
+<li class="chapter" data-level="11.5" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#soil-water-stresses-affecting-plant-growth"><i class="fa fa-check"></i><b>11.5</b> Soil water stresses affecting plant growth</a><ul>
+<li class="chapter" data-level="11.5.1" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#phenology-1"><i class="fa fa-check"></i><b>11.5.1</b> Phenology</a></li>
+<li class="chapter" data-level="11.5.2" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#photosynthesis"><i class="fa fa-check"></i><b>11.5.2</b> Photosynthesis</a></li>
+<li class="chapter" data-level="11.5.3" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#leaf-expansion"><i class="fa fa-check"></i><b>11.5.3</b> Leaf expansion</a></li>
+</ul></li>
+<li class="chapter" data-level="11.6" data-path="Crop-Water-Relations.html"><a href="Crop-Water-Relations.html#kl-factor"><i class="fa fa-check"></i><b>11.6</b> KL factor</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="nitrogen.html"><a href="nitrogen.html"><i class="fa fa-check"></i><b>12</b> Nitrogen</a><ul>
+<li class="chapter" data-level="12.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-supply"><i class="fa fa-check"></i><b>12.1</b> Nitrogen supply</a></li>
+<li class="chapter" data-level="12.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand"><i class="fa fa-check"></i><b>12.2</b> Nitrogen demand</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.2.1</b> Nitrogen demand of <code>Grain</code></a></li>
+<li class="chapter" data-level="12.2.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-demand-of-other-parts"><i class="fa fa-check"></i><b>12.2.2</b> Nitrogen demand of other parts</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake-partitioning-and-re-translocation"><i class="fa fa-check"></i><b>12.3</b> Nitrogen uptake, partitioning and re-translocation</a><ul>
+<li class="chapter" data-level="12.3.1" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-concentrations-in-wheat-parts"><i class="fa fa-check"></i><b>12.3.1</b> Nitrogen concentrations in wheat parts</a></li>
+<li class="chapter" data-level="12.3.2" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-uptake"><i class="fa fa-check"></i><b>12.3.2</b> Nitrogen uptake</a></li>
+<li class="chapter" data-level="12.3.3" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-translocation"><i class="fa fa-check"></i><b>12.3.3</b> Nitrogen translocation</a></li>
+<li class="chapter" data-level="12.3.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-re-translocation"><i class="fa fa-check"></i><b>12.3.4</b> Nitrogen re-translocation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="nitrogen.html"><a href="nitrogen.html#nitrogen-stresses"><i class="fa fa-check"></i><b>12.4</b> Nitrogen stresses</a><ul>
+<li class="chapter" data-level="12.4.1" data-path="nitrogen.html"><a href="nitrogen.html#phenology-2"><i class="fa fa-check"></i><b>12.4.1</b> Phenology</a></li>
+<li class="chapter" data-level="12.4.2" data-path="nitrogen.html"><a href="nitrogen.html#biomass-accumulation"><i class="fa fa-check"></i><b>12.4.2</b> Biomass accumulation</a></li>
+<li class="chapter" data-level="12.4.3" data-path="nitrogen.html"><a href="nitrogen.html#leaf-appearance-and-expansion-i.e.-leaf-number-and-lai"><i class="fa fa-check"></i><b>12.4.3</b> Leaf appearance and expansion (i.e. leaf number and LAI)</a></li>
+<li class="chapter" data-level="12.4.4" data-path="nitrogen.html"><a href="nitrogen.html#grain-filling-biomass-and-nitrogen-demand-of-grain"><i class="fa fa-check"></i><b>12.4.4</b> Grain filling (biomass and nitrogen demand of grain)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="Phosphorus-stress.html"><a href="Phosphorus-stress.html"><i class="fa fa-check"></i><b>13</b> Phosphorus</a></li>
+<li class="chapter" data-level="14" data-path="temperature.html"><a href="temperature.html"><i class="fa fa-check"></i><b>14</b> Temperature</a></li>
+<li class="chapter" data-level="15" data-path="light.html"><a href="light.html"><i class="fa fa-check"></i><b>15</b> Light</a></li>
+<li class="chapter" data-level="16" data-path="co2.html"><a href="co2.html"><i class="fa fa-check"></i><b>16</b> CO2</a></li>
+<li class="chapter" data-level="17" data-path="vapour-pressure-deficit-vpd.html"><a href="vapour-pressure-deficit-vpd.html"><i class="fa fa-check"></i><b>17</b> Vapour pressure deficit (VPD)</a></li>
+<li class="chapter" data-level="18" data-path="reference.html"><a href="reference.html"><i class="fa fa-check"></i><b>18</b> Reference</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/byzheng/apsim-classic-wheat-doc" target="blank">Github</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">APSIM Classic Wheat Documentation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="history" class="section level1 hasAnchor">
+<h1><span class="header-section-number">2</span> APSIM-Wheat history<a href="history.html#history" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>APSIM-Wheat has been developed from a combination of the approaches
+used in previous APSIM wheat modules:
+<span class="citation">Asseng, Keating, et al. (<a href="#ref-assengPerformanceAPSIMwheatModel1998" role="doc-biblioref">1998</a>)</span>; <span class="citation">Asseng, Fillery, et al. (<a href="#ref-assengUseAPSIMWheat1998" role="doc-biblioref">1998</a>)</span>; <span class="citation">Keating et al. (<a href="#ref-keatingOverviewAPSIMModel2003" role="doc-biblioref">2003</a>)</span>; <span class="citation">Meinke et al. (<a href="#ref-meinkeImprovingWheatSimulation1997" role="doc-biblioref">1997</a>)</span>; <span class="citation">Meinke et al. (<a href="#ref-meinkeImprovingWheatSimulation1998" role="doc-biblioref">1998</a>)</span>.
+The current version of the model is implemented within the APSIM Plant
+model framework which is currently used for other crops such as grain
+legumes and canola. Most of the model constants (species-specific)
+and parameters (cultivar specific) are externalized from the code
+(wheat.xml file).</p>
+
+</div>
+<h3> Reference<a href="reference.html#reference" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references">
+<div id="ref-assengUseAPSIMWheat1998">
+<p>Asseng, S., I. R. P. Fillery, G. C. Anderson, P. J. Dolling, F. X. Dunin, and B. A. Keating. 1998. “Use of the APSIM Wheat Model to Predict Yield, Drainage, and NO<sub>3</sub><sup>-</sup> Leaching for a Deep Sand.” <em>Australian Journal of Experimental Agriculture</em> 49 (3): 363–78. <a href="http://www.publish.csiro.au/paper/A97095">http://www.publish.csiro.au/paper/A97095</a>.</p>
+</div>
+<div id="ref-assengPerformanceAPSIMwheatModel1998">
+<p>Asseng, S., B. A. Keating, I. R. P. Fillery, P. J. Gregory, J. W. Bowden, N. C. Turner, J. A. Palta, and D. G. Abrecht. 1998. “Performance of the APSIM-Wheat Model in Western Australia.” <em>Field Crops Research</em> 57 (2): 163–79. <a href="https://doi.org/10.1016/S0378-4290(97)00117-2">https://doi.org/10.1016/S0378-4290(97)00117-2</a>.</p>
+</div>
+<div id="ref-keatingOverviewAPSIMModel2003">
+<p>Keating, B. A., P. S. Carberry, G. L. Hammer, M. E. Probert, M. J. Robertson, D. Holzworth, N. I. Huth, et al. 2003. “An Overview of APSIM, a Model Designed for Farming Systems Simulation.” <em>European Journal of Agronomy</em> 18 (3-4): 267–88. <a href="https://doi.org/10.1016/S1161-0301(02)00108-9">https://doi.org/10.1016/S1161-0301(02)00108-9</a>.</p>
+</div>
+<div id="ref-meinkeImprovingWheatSimulation1997">
+<p>Meinke, H., G. L. Hammer, H. van Keulen, and R. Rabbinge. 1997. “Improving Wheat Simulation Capabilities in Australia from a Cropping Systems Perspective III. The Integrated Wheat Model (I_WHEAT).” <em>European Journal of Agronomy</em> 8 (1-2): 101–16. <a href="https://doi.org/10.1016/S1161-0301(97)00015-4">https://doi.org/10.1016/S1161-0301(97)00015-4</a>.</p>
+</div>
+<div id="ref-meinkeImprovingWheatSimulation1998">
+<p>Meinke, H., R. Rabbinge, G. L. Hammer, H. van Vankeulen, and P. Jamieson. 1998. “Improving Wheat Simulation Capabilities in Australia from a Cropping Systems Perspective II. Testing Simulation Capabilities of Wheat Growth.” <em>European Journal of Agronomy</em> 8 (1-2): 83–99. <a href="https://doi.org/10.1016/S1161-0301(97)00016-6">https://doi.org/10.1016/S1161-0301(97)00016-6</a>.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="scope.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="phenology.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/byzheng/apsim-classic-wheat-doc/edit/master/02-history.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
